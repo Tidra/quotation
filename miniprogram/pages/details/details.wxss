@@ -1,0 +1,169 @@
+/* miniprogram/pages/details/details.wxss */
+
+/* 名称 */
+
+.head {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5rpx 5%;
+}
+
+.head .title {
+  font-size: 75rpx;
+  color: white;
+}
+
+.head .code {
+  font-size: 14px;
+  color: grey;
+}
+
+.head .seach {
+  width: 25px;
+  height: 25px;
+}
+
+/* 数据内容 */
+
+.data {
+  width: 95%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.col-red {
+  color: red;
+}
+
+.col-green {
+  color: green;
+}
+
+.col-white {
+  color: white;
+}
+
+.font-18 {
+  font-size: 18px;
+}
+
+.left-data {
+  width: 35%;
+  text-align: center;
+  margin: auto 0;
+}
+
+.left-data .new-data {
+  font-size: 90rpx;
+}
+
+.left-data .up-data {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.right-data {
+  width: 60%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.right-data .column {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.down-data {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 32rpx;
+}
+
+.down-data .row {
+  width: 32%;
+  display: flex;
+  justify-content: space-between;
+  margin: 5rpx 0;
+}
+
+/* 图表 */
+
+.pic {
+  width: 95%;
+}
+
+.pic-opt {
+  width: 100%;
+  display: flex;
+  border: 1px solid grey;
+  border-radius: 5px;
+}
+
+.pic-opt text:not(:first-child) {
+  border-left: 1px solid grey;
+}
+
+.pic-opt .pic-sel {
+  width: 20%;
+  text-align: center;
+  color: white;
+  background: rgba(165, 165, 165, 0.863);
+}
+
+.pic-opt .pic-nosel {
+  width: 20%;
+  text-align: center;
+}
+
+/* 遮罩 */
+
+.shade {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.678);
+}
+
+.in-seach {
+  display: flex;
+  align-items: center;
+  background: rgb(182, 181, 181);
+  position: absolute;
+  top: 30%;
+  height: 40px;
+  width: 90%;
+  z-index: 300;
+  border: 1px solid white;
+  border-radius: 10px;
+}
+
+.in-seach .seach {
+  width: 30px;
+  height: 100%;
+  padding: 0 5px;
+}
+
+.in-seach input {
+  width: 80%;
+  height: 80%;
+  font-size: 20px;
+  padding-left: 5px;
+  border-left: 2px solid gray;
+}
+
+.in-seach button {
+  width: 20%;
+  padding: 5px;
+  margin: 0;
+  color: white;
+  background: rgb(46, 46, 46);
+  border-radius: 0 10px 10px 0;
+}

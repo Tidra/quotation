@@ -1,58 +1,11 @@
-<!--index.wxml-->
+<!--miniprogram/pages/seach/seach.wxml-->
 <view class="container">
 
   <!--头部-->
   <view class="head">
-    <image class="more" src='/icon/more.png' mode="aspectFit"></image>
-    <label class="title">行情</label>
+    <label class="title">搜索内容：{{seach_value}}</label>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
-
-  <!--总板块导航-->
-  <view class="preview">
-    <view class="pre-opt">
-      <text class="opt-yes">沪深</text>
-      <text class="opt-no">板块</text>
-      <text class="opt-no">港股</text>
-      <text class="opt-yes">全球</text>
-      <text class="opt-no">其他</text>
-    </view>
-    <scroll-view scroll-x="true" class="pre-items">
-      <view class="pre-item col-green">
-        <view class="pre-name">上证指数</view>
-        <view class="pre-sum">3039.67</view>
-        <view class="pre-num">
-          <text>-9.52</text>
-          <text>-0.31%</text>
-        </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">深证指数</view>
-        <view class="pre-sum">11629.70</view>
-        <view class="pre-num">
-          <text>120.61</text>
-          <text>1.05%</text>
-        </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">创业指板</view>
-        <view class="pre-sum">2226.64</view>
-        <view class="pre-num">
-          <text>39.90</text>
-          <text>1.82%</text>
-        </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">创业指板</view>
-        <view class="pre-sum">2226.64</view>
-        <view class="pre-num">
-          <text>39.90</text>
-          <text>1.82%</text>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-
   <!--板块信息-->
   <view class="inf">
     <view class="inf-opt">
