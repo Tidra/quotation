@@ -11,45 +11,21 @@
   <!--总板块导航-->
   <view class="preview">
     <view class="pre-opt">
-      <text class="opt-yes">沪深</text>
-      <text class="opt-no">板块</text>
-      <text class="opt-no">港股</text>
-      <text class="opt-yes">全球</text>
-      <text class="opt-no">其他</text>
+      <text id="hushen" class="{{select_id=='hushen'?'opt-yes':'opt-no'}}" bindtap="select">沪深</text>
+      <text id="concepts" class="{{select_id=='concepts'?'opt-yes':'opt-no'}}" bindtap="select">板块</text>
+      <text id="hongkong" class="{{select_id=='hongkong'?'opt-yes':'opt-no'}}" bindtap="select">港股</text>
+      <text id="globle" class="{{select_id=='globle'?'opt-yes':'opt-no'}}" bindtap="select">全球</text>
+      <text id="others" class="{{select_id=='others'?'opt-yes':'opt-no'}}" bindtap="select">其他</text>
     </view>
     <scroll-view scroll-x="true" class="pre-items">
-      <view class="pre-item col-green">
-        <view class="pre-name">上证指数</view>
-        <view class="pre-sum">3039.67</view>
+      <navigator url="/pages/details/details?code={{item.code}}" class="pre-item {{item.change>0?'col-red':'col-green'}}" wx:for="{{value_index[select_id]}}" data-item="item">
+        <view class="pre-name">{{item.name}}</view>
+        <view class="pre-sum">{{item.current}}</view>
         <view class="pre-num">
-          <text>-9.52</text>
-          <text>-0.31%</text>
+          <text>{{item.change}}</text>
+          <text>{{item.change_pct}}%</text>
         </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">深证指数</view>
-        <view class="pre-sum">11629.70</view>
-        <view class="pre-num">
-          <text>120.61</text>
-          <text>1.05%</text>
-        </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">创业指板</view>
-        <view class="pre-sum">2226.64</view>
-        <view class="pre-num">
-          <text>39.90</text>
-          <text>1.82%</text>
-        </view>
-      </view>
-      <view class="pre-item col-red">
-        <view class="pre-name">创业指板</view>
-        <view class="pre-sum">2226.64</view>
-        <view class="pre-num">
-          <text>39.90</text>
-          <text>1.82%</text>
-        </view>
-      </view>
+      </navigator>
     </scroll-view>
   </view>
 
@@ -61,44 +37,17 @@
       <text class="width-20">涨幅</text>
       <text class="width-20">涨跌</text>
     </view>
-    <navigator url="/pages/details/details?title=navigate">
-      <view class="inf-item col-red">
+    <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value[select_id]}}" data-item="item">
+      <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
         <view class="item width-40">
-          <text class="name">N神工</text>
-          <text class="code">688233</text>
+          <text class="name">{{item.name}}</text>
+          <text class="code">{{item.code}}</text>
         </view>
-        <text class="width-20">77.96</text>
-        <text class="width-20">259.76%</text>
-        <text class="width-20">56.29</text>
+        <text class="width-20">{{item.current}}</text>
+        <text class="width-20">{{item.change_pct}}%</text>
+        <text class="width-20">{{item.change}}</text>
       </view>
     </navigator>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">N石头</text>
-        <text class="code">688169</text>
-      </view>
-      <text class="width-20">500.10</text>
-      <text class="width-20">84.46%</text>
-      <text class="width-20">228.98</text>
-    </view>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">N百奥泰</text>
-        <text class="code">688177</text>
-      </view>
-      <text class="width-20">60.20</text>
-      <text class="width-20">83.76%</text>
-      <text class="width-20">27.44</text>
-    </view>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">卓易信息</text>
-        <text class="code">688258</text>
-      </view>
-      <text class="width-20">132.80</text>
-      <text class="width-20">16.29%</text>
-      <text class="width-20">18.60</text>
-    </view>
   </view>
 
   <!-- 搜索遮罩 -->

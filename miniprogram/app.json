@@ -11,6 +11,5 @@
     "navigationBarTitleText": "市场行情分析小程序",
     "navigationBarTextStyle": "white"
   },
-  "sitemapLocation": "sitemap.json",
-  "style": "v2"
+  "sitemapLocation": "sitemap.json"
 }

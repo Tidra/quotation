@@ -2,73 +2,73 @@
 <view class="container">
   <!--数据部分-->
   <view class="head">
-    <view class="title">中关村
-      <text class="code">000931</text>
+    <view class="title">{{value.name}}
+      <text class="code">{{value.code}}</text>
     </view>    
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
   <view class="data">
     <view class="left-data col-red">
-      <text class="new-data">15.85</text>
+      <text class="new-data">{{value.current}}</text>
       <view class="up-data">
-        <text>+1.44</text>
-        <text>+99.9%</text>
+        <text>{{value.change>0?'+':''}}{{value.change}}</text>
+        <text>{{value.change>0?'+':''}}{{value.change_pct}}%</text>
       </view>
     </view>
     <view class="right-data">
       <view class="column">
         <text>今开</text>
-        <text class="font-18 col-white">14.25</text>
+        <text class="font-18 col-white">{{value.open}}</text>
       </view>
       <view class="column">
         <text>昨收</text>
-        <text class="font-18 col-white">14.41</text>
+        <text class="font-18 col-white">{{value.pre_close}}</text>
       </view>
       <view class="column">
         <text>成交量</text>
-        <text class="font-18 col-white">49.23万手</text>
+        <text class="font-18 col-white">{{value.volume}}万手</text>
       </view>
       <view class="column">
         <text>换手率</text>
-        <text class="font-18 col-white">9.77%</text>
+        <text class="font-18 col-white">{{value.turnover_ratio}}%</text>
       </view>
     </view>
     <view class="down-data">
       <view class="row">
         <text>最高</text>
-        <text class="col-white">15.85</text>
+        <text class="col-white">{{value.high}}</text>
       </view>
       <view class="row">
         <text>最低</text>
-        <text class="col-white">14.05</text>
+        <text class="col-white">{{value.low}}</text>
       </view>
       <view class="row">
         <text>成交额</text>
-        <text class="col-white">7.44亿</text>
+        <text class="col-white">{{value.sum_amount}}亿</text>
       </view>
       <view class="row">
         <text>内盘</text>
-        <text class="col-white">23.85万</text>
+        <text class="col-white">{{value.sell}}万</text>
       </view>
       <view class="row">
         <text>外盘</text>
-        <text class="col-white">25.58万</text>
+        <text class="col-white">{{value.buy}}万</text>
       </view>
       <view class="row">
         <text>总市值</text>
-        <text class="col-white">103亿</text>
+        <text class="col-white">{{value.market_cap}}亿</text>
       </view>
       <view class="row">
         <text>市盈率</text>
-        <text class="col-white">777.85</text>
+        <text class="col-white">{{value.pe}}</text>
       </view>
       <view class="row">
         <text>振幅</text>
-        <text class="col-white">12.49%</text>
+        <text class="col-white">{{value.amplitude}}%</text>
       </view>
       <view class="row">
         <text>流通市值</text>
-        <text class="col-white">80.3亿</text>
+        <text class="col-white">{{value.circulating_market_cap}}亿</text>
       </view>
     </view>
   </view>
@@ -76,11 +76,11 @@
   <!--图例部分-->
   <view class="pic">
     <view class="pic-opt">
-      <text class="pic-nosel">分时</text>
-      <text class="pic-nosel">五日</text>
-      <text class="pic-sel">日K</text>
-      <text class="pic-nosel">周K</text>
-      <text class="pic-nosel">月K</text>
+      <text id="mh" class="{{select_id=='mh'?'pic-sel':'pic-nosel'}}" bindtap="select">分时</text>
+      <text id="fd" class="{{select_id=='fd'?'pic-sel':'pic-nosel'}}" bindtap="select">五日</text>
+      <text id="dk" class="{{select_id=='dk'?'pic-sel':'pic-nosel'}}" bindtap="select">日K</text>
+      <text id="wk" class="{{select_id=='wk'?'pic-sel':'pic-nosel'}}" bindtap="select">周K</text>
+      <text id="mk" class="{{select_id=='mk'?'pic-sel':'pic-nosel'}}" bindtap="select">月K</text>
     </view>
     <view>
       <!--折线图-->
