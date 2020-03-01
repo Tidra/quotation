@@ -8,7 +8,7 @@
 - [x] [静态页面编写](#静态页面编写)
 - [x] [动态数据及传参](#动态数据及传参)
 - [x] [图表设计及代码](#图表设计及代码)
-- [ ] [函数、功能等设计](#函数、功能等设计)
+- [ ] [函数、功能等设计](#函数功能等设计)
 - [ ] [数据库数据获取api](#数据库数据获取api)
 - [ ] [后续功能修改或增加](#后续功能修改或增加)
 
@@ -24,10 +24,12 @@
 
 **目前设计图样如下:**
 
-![主页（index）](imgs/index.jpg)
-![详细数据页（details）](imgs/details.jpg)
-![搜索中](imgs/seaching.jpg)
-![搜索页（seach）](imgs/seach.jpg)
+<div align="center">
+  <img src="imgs/index.jpg" height="330" width="190" alt="主页（index）" >
+  <img src="imgs/details.jpg" height="330" width="190" alt="详细数据页（details）" style="margin:5px;" >
+  <img src="imgs/seaching.jpg" height="330" width="190" alt="搜索中" style="margin-left:5px;" >
+  <img src="imgs/seach.jpg" height="330" width="190" alt="搜索页（seach）" style="margin-left:5px;" >
+</div>
 
 ## 静态页面编写
 
