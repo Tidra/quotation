@@ -1,4 +1,8 @@
 // miniprogram/pages/details/details.js
+var wxCharts = require("../../unit/wxcharts.js");
+//定义记录初始屏幕宽度比例，便于初始化
+var windowW = 0;
+
 Page({
 
   /**
@@ -31,7 +35,7 @@ Page({
   },
 
   // 选择显示图表
-  select: function (e) {
+  select: function(e) {
     this.setData({
       select_id: e.currentTarget.id
     })
@@ -80,9 +84,17 @@ Page({
       amplitude: 12.49,
       circulating_market_cap: 80.3
     };
+
+    // 具体数据、屏幕宽度
     this.setData({
-      value: value
-    })
+      value: value,
+      imageWidth: wx.getSystemInfoSync().windowWidth
+    });
+    console.log(this.data.imageWidth);
+
+    //计算屏幕宽度比列
+    windowW = this.data.imageWidth / 375;
+    console.log(windowW);
   },
 
   /**
@@ -96,7 +108,44 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function() {
-
+    //lineCanvas
+    new wxCharts({
+      canvasId: 'lineCanvas',
+      type: 'line',
+      categories: ['2016-1', '2017-1', '2018-1', '2019-1', '2020-1', '2021-1', '2022-1', '2023-1', '2024-1', '2025-1', '2026-1'],
+      animation: true,
+      background: '#f5f5f5',
+      series: [{
+        name: '成交量1',
+        data: [16, 12, 15, 11, 13, 17, 18, 16, 15, 14],
+        format: function(val, name) {
+          return val.toFixed(2) + '万';
+        }
+      }, {
+        name: '成交量2',
+        data: [2, 0, 0, 3, null, 4, 0, 0, 2, 0],
+        format: function(val, name) {
+          return val.toFixed(2) + '万';
+        }
+      }],
+      xAxis: {
+        disableGrid: true
+      },
+      yAxis: {
+        title: '成交金额 (万元)',
+        format: function(val) {
+          return val.toFixed(2);
+        },
+        min: 0
+      },
+      width: (375 * windowW),
+      height: (200 * windowW),
+      dataLabel: false,
+      dataPointShape: true,
+      extra: {
+        lineStyle: 'curve'
+      }
+    });
   },
 
   /**

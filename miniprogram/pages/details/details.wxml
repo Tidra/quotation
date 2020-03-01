@@ -4,7 +4,7 @@
   <view class="head">
     <view class="title">{{value.name}}
       <text class="code">{{value.code}}</text>
-    </view>    
+    </view>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
   <view class="data">
@@ -82,9 +82,8 @@
       <text id="wk" class="{{select_id=='wk'?'pic-sel':'pic-nosel'}}" bindtap="select">周K</text>
       <text id="mk" class="{{select_id=='mk'?'pic-sel':'pic-nosel'}}" bindtap="select">月K</text>
     </view>
-    <view>
-      <!--折线图-->
-    </view>
+    <!--折线图-->
+    <canvas canvas-id="lineCanvas" disable-scroll="true" class="canvas" style="width:100%; height:300px;"></canvas>
     <view>
       <!--成交量图-->
     </view>
