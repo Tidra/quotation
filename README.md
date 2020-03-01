@@ -16,7 +16,7 @@
 
 体验版可扫下面的二维码：
 
-<img src="imgs/index.jpg" height="200" width="200" alt="体验版二维码" >
+<img src="imgs/code.jpg" height="200" width="200" alt="体验版二维码" >
 
 ## 初步页面设计
 
