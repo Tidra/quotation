@@ -23,7 +23,7 @@
         <view class="pre-sum">{{item.current}}</view>
         <view class="pre-num">
           <text>{{item.change}}</text>
-          <text>{{item.change_pct}}%</text>
+          <text>{{item.quoteChange}}%</text>
         </view>
       </navigator>
     </scroll-view>
@@ -32,10 +32,10 @@
   <!--板块信息-->
   <view class="inf">
     <view class="inf-opt">
-      <text class="width-40">股票名称</text>
-      <text class="width-20">最新</text>
-      <text class="width-20">涨幅</text>
-      <text class="width-20">涨跌</text>
+      <view id="sort1" class="width-40" bindtap="sort">股票名称</view>
+      <view id="sort2" class="width-20" bindtap="sort">最新<image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image></view>
+      <view id="sort3" class="width-20" bindtap="sort">涨幅<image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image></view>
+      <view id="sort4" class="width-20" bindtap="sort">涨跌<image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image></view>
     </view>
     <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value[select_id]}}" data-item="item">
       <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
@@ -44,7 +44,7 @@
           <text class="code">{{item.code}}</text>
         </view>
         <text class="width-20">{{item.current}}</text>
-        <text class="width-20">{{item.change_pct}}%</text>
+        <text class="width-20">{{item.quoteChange}}%</text>
         <text class="width-20">{{item.change}}</text>
       </view>
     </navigator>

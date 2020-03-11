@@ -1,4 +1,5 @@
 // miniprogram/pages/seach/seach.js
+var db = require("../../unit/db.js")
 Page({
 
   /**
@@ -6,6 +7,48 @@ Page({
    */
   data: {
     is_hide: 'none',
+    sort_by: 'comprehensive',
+    sort_icon: ['up-down', 'up-down', 'up-down'],
+  },
+
+  // 排序
+  sort: function(e) {
+    console.log(e.currentTarget.id);
+    var sort_by = this.data.sort_by;
+    var sort_icon = ['up-down', 'up-down', 'up-down'];
+    if (e.currentTarget.id == "sort1") {
+      sort_by = 'comprehensive';
+    } else if (e.currentTarget.id == "sort2") {
+      if (sort_by == 'closingPriceDrop') {
+        console.log(sort_by)
+        sort_by = 'closingPriceRise';
+        sort_icon[0] = 'up';
+      } else {
+        sort_by = 'closingPriceDrop';
+        sort_icon[0] = 'down';
+      }
+    } else if (e.currentTarget.id == "sort3") {
+      if (sort_by == 'quoteChangeDrop') {
+        sort_by = 'quoteChangeRise';
+        sort_icon[1] = 'up';
+      } else {
+        sort_by = 'quoteChangeDrop';
+        sort_icon[1] = 'down';
+      }
+    } else {
+      if (sort_by == 'changeDrop') {
+        sort_by = 'changeRise';
+        sort_icon[2] = 'up';
+      } else {
+        sort_by = 'changeDrop';
+        sort_icon[2] = 'down';
+      }
+    }
+    this.setData({
+      sort_by,
+      sort_icon
+    });
+    this.dataLoad(this.data.seach_value, sort_by, 1)
   },
 
   // 显示搜索框
@@ -21,9 +64,38 @@ Page({
 
   seach: function(e) {
     this.setData({
-      seach_value: e.detail.value.seach_value
+      seach_value: e.detail.value.seach_value,
+      sort_by: 'comprehensive',
+      sort_icon: ['up-down', 'up-down', 'up-down']
     });
     this.seachIs();
+    this.dataLoad(e.detail.value.seach_value, 'comprehensive', 1)
+  },
+
+  //数据获取
+  dataLoad: function(data, order, start) {
+    db.getData.selectFuzzy(data, order, start).then(res => {
+        //请求成功
+        console.log(res, typeof(res.data))
+        var value = this.data.value;
+        value = res.data.map(function(e) {
+          return {
+            code: e.code,
+            name: e.name,
+            current: e.closingPrice,
+            previousClose: e.previousClose,
+            quoteChange: e.quoteChange,
+            change: e.change
+          }
+        });
+        console.log(value)
+        this.setData({
+          value
+        })
+      })
+      .catch(err => {
+        //请求失败
+      });
   },
 
   /**
@@ -34,6 +106,7 @@ Page({
     this.setData({
       seach_value: options.seach_value,
     })
+    this.dataLoad(options.seach_value, 'comprehensive', 1)
   },
 
   /**

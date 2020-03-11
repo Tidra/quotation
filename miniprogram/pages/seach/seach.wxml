@@ -6,52 +6,26 @@
     <label class="title">搜索内容：{{seach_value}}</label>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
+
   <!--板块信息-->
   <view class="inf">
     <view class="inf-opt">
-      <text class="width-40">股票名称</text>
-      <text class="width-20">最新</text>
-      <text class="width-20">涨幅</text>
-      <text class="width-20">涨跌</text>
+      <view id="sort1" class="width-40" bindtap="sort">股票名称</view>
+      <view id="sort2" class="width-20" bindtap="sort">最新<image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image></view>
+      <view id="sort3" class="width-20" bindtap="sort">涨幅<image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image></view>
+      <view id="sort4" class="width-20" bindtap="sort">涨跌<image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image></view>
     </view>
-    <navigator url="/pages/details/details?title=navigate">
-      <view class="inf-item col-red">
+    <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value}}" data-item="item">
+      <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
         <view class="item width-40">
-          <text class="name">N神工</text>
-          <text class="code">688233</text>
+          <text class="name">{{item.name}}</text>
+          <text class="code">{{item.code}}</text>
         </view>
-        <text class="width-20">77.96</text>
-        <text class="width-20">259.76%</text>
-        <text class="width-20">56.29</text>
+        <text class="width-20">{{item.current}}</text>
+        <text class="width-20">{{item.quoteChange}}%</text>
+        <text class="width-20">{{item.change}}</text>
       </view>
     </navigator>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">N石头</text>
-        <text class="code">688169</text>
-      </view>
-      <text class="width-20">500.10</text>
-      <text class="width-20">84.46%</text>
-      <text class="width-20">228.98</text>
-    </view>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">N百奥泰</text>
-        <text class="code">688177</text>
-      </view>
-      <text class="width-20">60.20</text>
-      <text class="width-20">83.76%</text>
-      <text class="width-20">27.44</text>
-    </view>
-    <view class="inf-item col-red">
-      <view class="item width-40">
-        <text class="name">卓易信息</text>
-        <text class="code">688258</text>
-      </view>
-      <text class="width-20">132.80</text>
-      <text class="width-20">16.29%</text>
-      <text class="width-20">18.60</text>
-    </view>
   </view>
 
   <!-- 搜索遮罩 -->

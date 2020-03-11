@@ -119,14 +119,21 @@
   background: grey;
 }
 
+.opt-icon {
+  width: 15px;
+  height: 15px;
+}
+
 .width-40 {
   text-align: left;
   width: 31%;
 }
 
 .width-20 {
-  text-align: center;
   width: 23%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .inf-item {

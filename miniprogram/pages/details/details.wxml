@@ -8,55 +8,55 @@
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
   <view class="data">
-    <view class="left-data col-red">
+    <view class="left-data {{value.change>0?'col-red':'col-green'}}">
       <text class="new-data">{{value.current}}</text>
       <view class="up-data">
         <text>{{value.change>0?'+':''}}{{value.change}}</text>
-        <text>{{value.change>0?'+':''}}{{value.change_pct}}%</text>
+        <text>{{value.change>0?'+':''}}{{value.quoteChange}}%</text>
       </view>
     </view>
     <view class="right-data">
       <view class="column">
         <text>今开</text>
-        <text class="font-18 col-white">{{value.open}}</text>
+        <text class="font-18 col-white">{{value.openingPrice}}</text>
       </view>
       <view class="column">
         <text>昨收</text>
-        <text class="font-18 col-white">{{value.pre_close}}</text>
+        <text class="font-18 col-white">{{value.previousClose}}</text>
       </view>
       <view class="column">
         <text>成交量</text>
-        <text class="font-18 col-white">{{value.volume}}万手</text>
+        <text class="font-18 col-white">{{value.volume}}手</text>
       </view>
       <view class="column">
         <text>换手率</text>
-        <text class="font-18 col-white">{{value.turnover_ratio}}%</text>
+        <text class="font-18 col-white">{{value.turnoverRate}}%</text>
       </view>
     </view>
     <view class="down-data">
       <view class="row">
         <text>最高</text>
-        <text class="col-white">{{value.high}}</text>
+        <text class="col-white">{{value.maxPrice}}</text>
       </view>
       <view class="row">
         <text>最低</text>
-        <text class="col-white">{{value.low}}</text>
+        <text class="col-white">{{value.minPrice}}</text>
       </view>
       <view class="row">
         <text>成交额</text>
-        <text class="col-white">{{value.sum_amount}}亿</text>
+        <text class="col-white">{{value.turnover}}</text>
       </view>
       <view class="row">
         <text>内盘</text>
-        <text class="col-white">{{value.sell}}万</text>
+        <text class="col-white">{{value.sell}}</text>
       </view>
       <view class="row">
         <text>外盘</text>
-        <text class="col-white">{{value.buy}}万</text>
+        <text class="col-white">{{value.buy}}</text>
       </view>
       <view class="row">
         <text>总市值</text>
-        <text class="col-white">{{value.market_cap}}亿</text>
+        <text class="col-white">{{value.totalMarketCapitaliza}}</text>
       </view>
       <view class="row">
         <text>市盈率</text>
@@ -68,7 +68,7 @@
       </view>
       <view class="row">
         <text>流通市值</text>
-        <text class="col-white">{{value.circulating_market_cap}}亿</text>
+        <text class="col-white">{{value.marketCapitalization}}</text>
       </view>
     </view>
   </view>
@@ -83,7 +83,7 @@
       <text id="mk" class="{{select_id=='mk'?'pic-sel':'pic-nosel'}}" bindtap="select">月K</text>
     </view>
     <!--折线图-->
-    <canvas canvas-id="lineCanvas" disable-scroll="true" class="canvas" style="width:100%; height:300px;"></canvas>
+    <canvas canvas-id="lineCanvas" disable-scroll="true" class="canvas" style="width:99%; height:200px;"></canvas>
     <view>
       <!--成交量图-->
     </view>
