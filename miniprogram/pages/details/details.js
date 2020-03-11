@@ -96,6 +96,18 @@ Page({
     return num
   },
 
+  getWeek: function(dt) {
+    let d1 = new Date(dt);
+    let d2 = new Date(dt);
+    d2.setMonth(0);
+    d2.setDate(1);
+    let rq = d1 - d2;
+    let days = Math.ceil(rq / (24 * 60 * 60 * 1000));
+    let num = Math.ceil(days / 7);
+    console.log(num)
+    return num;
+  },
+
   //数据获取
   dataLoad: function(code, date_unit, num) {
     db.getData.selectByCode(code, date_unit, num).then(res => {
@@ -161,6 +173,7 @@ Page({
   //绘图
   createLine: function(value) {
     var type = this.changeUnit(value[0].turnover, 'type');
+    var getWeek = this.getWeek;
     //lineCanvas
     new wxCharts({
       canvasId: 'lineCanvas',
