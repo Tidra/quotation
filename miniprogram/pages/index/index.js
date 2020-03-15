@@ -7,7 +7,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-    is_hide: 'none',
+    is_seach: false,
+    is_sidebar: false,
     select_id: 'hushen',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
@@ -65,7 +66,8 @@ Page({
   },
 
   //显示更多
-  showMore:function(){
+  showMore: function() {
+    this.closeAll();
     wx.navigateTo({
       url: '/pages/user/user',
     })
@@ -127,20 +129,31 @@ Page({
   },
 
   // 显示搜索框
-  seachIs: function() {
-    var is_hide = 'none';
-    if (this.data.is_hide == 'none') {
-      is_hide = 'flex';
-    }
+  showSeach: function() {
     this.setData({
-      is_hide: is_hide,
+      is_seach: true
     })
   },
 
-  seach: function (e) {
-    this.seachIs();
+  //显示侧边栏
+  showSidebar: function(){
+    this.setData({
+      is_sidebar: true
+    })
+  },
+
+  //关闭所有
+  closeAll: function(){
+    this.setData({
+      is_sidebar: false,
+      is_seach: false
+    })
+  },
+
+  seach: function(e) {
+    this.closeAll();
     var seach_value = "";
-    if (typeof (e.detail.value) == 'string') {
+    if (typeof(e.detail.value) == 'string') {
       seach_value = e.detail.value;
     } else {
       seach_value = e.detail.value.seach_value;
@@ -188,7 +201,7 @@ Page({
       .catch(err => {
         //请求失败
       });
-    setTimeout(function () {
+    setTimeout(function() {
       wx.hideLoading()
     }, 5000)
   },
@@ -274,7 +287,7 @@ Page({
       .catch(err => {
         //请求失败
       });
-    setTimeout(function () {
+    setTimeout(function() {
       // 隐藏导航栏加载框
       wx.hideNavigationBarLoading();
       // 停止下拉动作

@@ -3,9 +3,9 @@
 
   <!--头部-->
   <view class="head">
-    <image class="more" src='/icon/more.png' mode="aspectFit" bindtap="showMore"></image>
+    <image class="more" src='/icon/more.png' mode="aspectFit" bindtap="showSidebar"></image>
     <label class="title">行情</label>
-    <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
+    <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="showSeach"></image>
   </view>
 
   <!--总板块导航-->
@@ -59,13 +59,31 @@
   </view>
 
   <!-- 搜索遮罩 -->
-  <view class="shade" style="display:{{is_hide}};" bindtap="seachIs"></view>
-  <form bindsubmit="seach" style="display:{{is_hide}}; width:90%;">
+  <view class="shade" style="display:{{is_seach||is_sidebar?'block':'none'}};" bindtap="closeAll"></view>
+  <form bindsubmit="seach" style="display:{{is_seach?'flex':'none'}}; width:90%;">
     <view class="in-seach">
       <image class="seach" src='/icon/seach.png' mode="aspectFit"></image>
       <input name="seach_value" focus="true" confirm-type="search" placeholder="股票名称/代码" bindconfirm="seach"></input>
       <button form-type="submit">搜索</button>
     </view>
   </form>
+
+  <!-- 侧边框 -->
+  <view class="sidebar" style="left: {{is_sidebar?'0':'-200px'}}">
+    <view class="user">
+      <image class="user-img" src="../../icon/user-unlogin.png"></image>
+      <view class="user-inf">
+        <view>点击登录</view>
+        <!-- <view>ID:as1s2da3d5s35as6</view> -->
+      </view>
+    </view>
+    <view class="item-is" bindtap="closeAll">行情数据</view>
+    <view class="item" bindtap="showMore">自选内容</view>
+    <view class="about">
+      <view>关于：</view>
+      <view>本小程序主要用于学习所用，未经授权不得用于任何商业用途。</view>
+      <view>Design by 车松轩</view>
+    </view>
+  </view>
 
 </view>
