@@ -2,12 +2,13 @@
   "pages": [
     "pages/index/index",
     "pages/details/details",
-    "pages/seach/seach"
+    "pages/seach/seach",
+    "pages/user/user"
   ],
   "window": {
-    "backgroundColor": "#0c090a",
+    "backgroundColor": "#0e0e0e",
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#0c090a",
+    "navigationBarBackgroundColor": "#0e0e0e",
     "navigationBarTitleText": "市场行情分析小程序",
     "navigationBarTextStyle": "white"
   },

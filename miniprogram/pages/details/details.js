@@ -1,8 +1,12 @@
 // miniprogram/pages/details/details.js
-var wxCharts = require("../../unit/wxcharts.js");
+import uCharts from '../../unit/u-charts.js';
 var db = require("../../unit/db.js");
+
 //定义记录初始屏幕宽度比例，便于初始化
-var windowW = 0;
+var _self;
+var canvaColumn = null;
+var canvaLine = null;
+var canvaCandle = null;
 
 Page({
 
@@ -10,8 +14,9 @@ Page({
    * 页面的初始数据
    */
   data: {
+    itemCount: 20,
     is_hide: 'none',
-    select_id: 'mh',
+    select_id: 'dk',
     /**
      * code:代码
      * name:名称
@@ -37,12 +42,41 @@ Page({
     all_value: []
   },
 
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    _self = this;
+    this.cWidth = wx.getSystemInfoSync().windowWidth;
+    this.cHeight = 250;
+
+    this.dataLoad(options.code, 'day', 30);
+
+    // 具体数据、屏幕宽度
+    this.setData({
+      code: options.code,
+    });
+  },
+
   // 选择显示图表
   select: function(e) {
+    if (this.data.select_id == e.currentTarget.id) {
+      return;
+    }
     this.setData({
       select_id: e.currentTarget.id
     });
-    this.dataLoad(this.data.code, 'day', 20);
+    if (e.currentTarget.id == "fd") {
+      this.dataLoad(this.data.code, 'day', 5);
+    } else if (e.currentTarget.id == "dk") {
+      this.dataLoad(this.data.code, 'day', 30);
+    } else if (e.currentTarget.id == "wk") {
+      this.dataLoad(this.data.code, 'week', 5 * 30);
+    } else if (e.currentTarget.id == "mk") {
+      this.dataLoad(this.data.code, 'month', 31 * 30);
+    } else if (e.currentTarget.id == "mh") {
+      this.dataLoad(this.data.code, 'day', 5);
+    }
   },
 
 
@@ -59,8 +93,14 @@ Page({
 
   seach: function(e) {
     this.seachIs();
+    var seach_value = "";
+    if (typeof(e.detail.value) == 'string') {
+      seach_value = e.detail.value;
+    } else {
+      seach_value = e.detail.value.seach_value;
+    }
     wx.navigateTo({
-      url: '/pages/seach/seach?seach_value=' + e.detail.value.seach_value,
+      url: '/pages/seach/seach?seach_value=' + seach_value,
     })
   },
 
@@ -96,20 +136,125 @@ Page({
     return num
   },
 
-  getWeek: function(dt) {
-    let d1 = new Date(dt);
-    let d2 = new Date(dt);
-    d2.setMonth(0);
-    d2.setDate(1);
-    let rq = d1 - d2;
-    let days = Math.ceil(rq / (24 * 60 * 60 * 1000));
-    let num = Math.ceil(days / 7);
-    console.log(num)
-    return num;
+  /**
+   * 单位化数据
+   */
+  mathOS: function(arr, type) {
+    var sum = 0;
+    var max = arr[0];
+    var min = arr[0];
+    var frist = arr[0];
+    var last;
+    for (var i = 0; i < arr.length; i++) {
+      last = arr[i];
+      if (max < arr[i]) {
+        max = arr[i];
+      }
+      if (min > arr[i]) {
+        min = arr[i];
+      }
+      sum += arr[i];
+    }
+    if (type == "sum") {
+      return sum;
+    } else if (type == "max") {
+      return max;
+    } else if (type == "min") {
+      return min;
+    } else if (type == "frist") {
+      return frist;
+    } else if (type == "last") {
+      return last;
+    }
+    return Math.round(sum / arr.length * 100) / 100;
   },
+  //各单位
+  getTypeData: function(data, type) {
+    var newData = {};
+    var typeFunc = function(date) {
+      return date
+    };
+    if (type == "week") {
+      typeFunc = function(date) {
+        let d1 = new Date(date);
+        let d2 = new Date(date);
+        d2.setMonth(0);
+        d2.setDate(1);
+        let rq = d1 - d2;
+        let days = Math.ceil(rq / (24 * 60 * 60 * 1000));
+        let num = Math.ceil(days / 7);
+        return date.substring(0, 4) + (Array(2).join("0") + num).slice(-2);
+      }
+    } else if (type == "month") {
+      typeFunc = function(date) {
+        date = date.split("-");
+        return date[0] + "-" + date[1];
+      }
+    }
+    for (var i in data) {
+      var num = typeFunc(data[i].date);
+      if (newData.hasOwnProperty(num)) {
+        newData[num].openingPrice.push(data[i].openingPrice);
+        newData[num].closingPrice.push(data[i].closingPrice);
+        newData[num].maxPrice.push(data[i].maxPrice);
+        newData[num].minPrice.push(data[i].minPrice);
+        newData[num].volume.push(data[i].volume);
+      } else {
+        newData[num] = {
+          openingPrice: [data[i].openingPrice],
+          closingPrice: [data[i].closingPrice],
+          maxPrice: [data[i].maxPrice],
+          minPrice: [data[i].minPrice],
+          volume: [data[i].volume]
+        }
+      }
+    }
+
+    return {
+      categories: (newData => {
+        var arr = [];
+        for (var i in newData) {
+          arr.push(i);
+        }
+        return arr;
+      })(newData),
+      seriesCandle: [{
+        name: data[0].name,
+        data: (newData => {
+          var arr = [];
+          for (var i in newData) {
+            var e = newData[i];
+            var openingPrice = this.mathOS(e.openingPrice, 'frist');
+            var closingPrice = this.mathOS(e.closingPrice, 'last');
+            var minPrice = this.mathOS(e.minPrice, 'min');
+            var maxPrice = this.mathOS(e.maxPrice, 'max');
+            arr.push([openingPrice, closingPrice, minPrice, maxPrice]);
+          }
+          return arr;
+        })(newData)
+      }],
+      seriesColumn: [{
+        name: data[0].name,
+        data: (newData => {
+          var arr = [];
+          for (var i in newData) {
+            var e = newData[i];
+            var volume = this.mathOS(e.volume, 'sum');
+            arr.push(volume);
+          }
+          return arr;
+        })(newData)
+      }]
+    };
+  },
+
 
   //数据获取
   dataLoad: function(code, date_unit, num) {
+    // 显示加载图标
+    wx.showLoading({
+      title: '玩命加载中',
+    })
     db.getData.selectByCode(code, date_unit, num).then(res => {
         //请求成功
         var changeUnit = this.changeUnit;
@@ -134,100 +279,207 @@ Page({
           amplitude: ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
           marketCapitalization: changeUnit(res.data[0].marketCapitalization)
         };
-        var all_value = res.data.map(function(e) {
-          return {
-            date: e.date,
-            current: e.closingPrice,
-            previousClose: e.previousClose,
-            quoteChange: e.quoteChange,
-            change: e.change,
-            openingPrice: e.openingPrice,
-            volume: e.volume,
-            turnoverRate: e.turnoverRate,
-            maxPrice: e.maxPrice,
-            minPrice: e.minPrice,
-            turnover: e.turnover
-          }
-        });
-        all_value = all_value.sort(function(a, b) {
-          if (a.date < b.date) {
-            return -1
-          } else if (a.date > b.date) {
-            return 1
-          } else {
-            return 0
-          }
-        });
+        var all_value = res.data.reverse();
+
+        all_value = this.getTypeData(all_value, date_unit);
         console.log(all_value)
+        // 隐藏加载框
+        wx.hideLoading()
+
         this.setData({
           value,
-          all_value
+          all_value,
+          itemCount: all_value.categories.length
         });
-        this.createLine(all_value);
+        _self.showCandle("canvasCandle", all_value);
+        _self.showColumn("canvasColumn", all_value);
       })
       .catch(err => {
         //请求失败
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none',
+          duration: 2000 //持续的时间
+
+        })
       });
+    setTimeout(function() {
+      wx.hideLoading()
+    }, 5000)
   },
 
-  //绘图
-  createLine: function(value) {
-    var type = this.changeUnit(value[0].turnover, 'type');
-    var getWeek = this.getWeek;
-    //lineCanvas
-    new wxCharts({
-      canvasId: 'lineCanvas',
-      type: 'line',
-      categories: value.map(function(e) {
-        return e.date
-      }),
+  /**
+   * 柱形图
+   */
+  showColumn(canvasId, chartData) {
+    canvaColumn = new uCharts({
+      $this: _self,
+      canvasId: canvasId,
+      type: 'column',
+      legend: false,
+      fontSize: 11,
+      background: '#0e0e0e',
+      pixelRatio: 1,
       animation: true,
-      background: '#f5f5f5',
-      series: [{
-        name: '成交量',
-        data: value.map(function(e) {
-          return e.turnover / type[0]
-        }),
-        format: function(val, name) {
-          return val.toFixed(2) + type[1];
-        }
-      }],
+      enableScroll: true,
+      categories: chartData.categories,
+      series: chartData.seriesColumn,
       xAxis: {
-        disableGrid: true
+        disable: true,
+        disableGrid: true,
+        itemCount: chartData.categories.length,
+        scrollShow: true,
+        scrollAlign: 'right',
+        labelCount: 4,
       },
       yAxis: {
-        title: '成交金额 (' + type[1] + '元)',
-        format: function(val) {
-          return val.toFixed(2);
-        },
-        min: 0
+        //disabled:true
+        // gridType: 'dash',
+        disableGrid: true,
+        showTitle: true,
+        splitNumber: 3,
+        data: [{
+          title: '成交量(万手)',
+          format: (val) => {
+            var val = val / 10000;
+            if(val < 100){
+              return val.toFixed(2);
+            }
+            return val.toFixed(0)
+          }
+        }]
       },
-      width: (375 * windowW + 13.5),
-      height: (200),
       dataLabel: false,
-      dataPointShape: true,
+      width: _self.cWidth,
+      height: _self.cHeight / 1.5,
       extra: {
-        lineStyle: 'curve'
+        column: {
+          type: 'group',
+          width: _self.cWidth / chartData.categories.length
+        },
+        tooltip: {
+          activeBgColor: '#fff'
+        }
+      }
+    });
+
+  },
+  touchEndColumn(e) {
+    canvaColumn.scrollEnd(e);
+    canvaCandle.scrollEnd(e);
+    canvaColumn.showToolTip(e, {
+      format: function(item, category) {
+        if (typeof item.data === 'object') {
+          return category + ' ' + item.name + ':' + item.data.value
+        } else {
+          return category + ' ' + item.name + ':' + item.data
+        }
       }
     });
   },
 
   /**
-   * 生命周期函数--监听页面加载
+   *  K线图
    */
-  onLoad: function(options) {
-    this.dataLoad(options.code, 'day', 30)
-
-    // 具体数据、屏幕宽度
-    this.setData({
-      code: options.code,
-      imageWidth: wx.getSystemInfoSync().windowWidth
+  showCandle(canvasId, chartData) {
+    canvaCandle = new uCharts({
+      $this: _self,
+      canvasId: canvasId,
+      type: 'candle',
+      fontSize: 11,
+      legend: true,
+      background: '#0e0e0e',
+      pixelRatio: 1,
+      categories: chartData.categories,
+      series: chartData.seriesCandle,
+      animation: true,
+      enableScroll: true,
+      xAxis: {
+        disableGrid: true,
+        itemCount: chartData.categories.length,
+        // scrollShow: true,
+        // scrollAlign: 'right',
+        labelCount: 4,
+      },
+      yAxis: {
+        //disabled:true
+        gridType: 'dash',
+        splitNumber: 5,
+        format: (val) => {
+          if(val < 100){
+            return val.toFixed(2)
+          }else if(val < 1000){
+            return val.toFixed(1)
+          }
+          return val.toFixed(0)
+        }
+      },
+      width: _self.cWidth,
+      height: _self.cHeight,
+      dataLabel: false,
+      dataPointShape: true,
+      extra: {
+        candle: {
+          color: {
+            upLine: '#ff0000',
+            upFill: '#ff0000',
+            downLine: '#00ff00',
+            downFill: '#00ff00'
+          },
+          average: {
+            show: true,
+            name: ['MA5', 'MA10', 'MA20'],
+            day: [5, 10, 20],
+            color: ['#1890ff', '#2fc25b', '#facc14']
+          }
+        },
+        tooltip: {
+          bgColor: '#000000',
+          bgOpacity: 0.7,
+          gridType: 'dash',
+          dashLength: 5,
+          gridColor: '#1890ff',
+          fontColor: '#FFFFFF',
+          horizentalLine: true,
+          xAxisLabel: true,
+          yAxisLabel: true,
+          labelBgColor: '#DFE8FF',
+          labelBgOpacity: 0.95,
+          labelAlign: 'left',
+          labelFontColor: '#666666'
+        }
+      },
     });
-    console.log(this.data.imageWidth);
-
-    //计算屏幕宽度比列
-    windowW = this.data.imageWidth * 0.95 / 380;
-    console.log(windowW);
+  },
+  touchCandle(e) {
+    canvaCandle.scrollStart(e);
+    canvaColumn.scrollStart(e);
+  },
+  moveCandle(e) {
+    canvaCandle.scroll(e);
+    canvaColumn.scroll(e);
+  },
+  touchEndCandle(e) {
+    canvaColumn.scrollEnd(e);
+    canvaCandle.scrollEnd(e);
+    //下面是toolTip事件，如果滚动后不需要显示，可不填写
+    canvaCandle.showToolTip(e, {
+      format: function(item, category) {
+        return category + ' ' + item.name + ':' + item.data
+      }
+    });
+  },
+  sliderMove(e) {
+    _self.itemCount = e.detail.value;
+    _self.zoomCandle(e.detail.value);
+  },
+  zoomCandle(val) {
+    canvaCandle.zoom({
+      itemCount: val
+    });
+    canvaColumn.zoom({
+      itemCount: val
+    });
   },
 
   /**

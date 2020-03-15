@@ -62,14 +62,20 @@ Page({
     })
   },
 
-  seach: function(e) {
+  seach: function (e) {
+    var seach_value = "";
+    if (typeof (e.detail.value) == 'string') {
+      seach_value = e.detail.value;
+    } else {
+      seach_value = e.detail.value.seach_value;
+    }
     this.setData({
-      seach_value: e.detail.value.seach_value,
+      seach_value,
       sort_by: 'comprehensive',
       sort_icon: ['up-down', 'up-down', 'up-down']
     });
     this.seachIs();
-    this.dataLoad(e.detail.value.seach_value, 'comprehensive', 1)
+    this.dataLoad(seach_value, 'comprehensive', 1)
   },
 
   //数据获取

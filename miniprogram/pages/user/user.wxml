@@ -1,10 +1,16 @@
-<!--miniprogram/pages/seach/seach.wxml-->
+<!--miniprogram/pages/user/user.wxml-->
 <view class="container">
 
   <!--头部-->
   <view class="head">
-    <label class="title">搜索内容：{{seach_value}}</label>
+    <image class="more" src='/icon/more.png' mode="aspectFit"></image>
+    <label class="title">自选</label>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
+  </view>
+
+  <view class="pic-opt">
+    <text id="gupiao" class="{{select_id=='gupiao'?'pic-sel':'pic-nosel'}}" bindtap="select">股票</text>
+    <text id="jijin" class="{{select_id=='jijin'?'pic-sel':'pic-nosel'}}" bindtap="select">基金</text>
   </view>
 
   <!--板块信息-->
@@ -21,17 +27,19 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value}}" data-item="item">
-      <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
-        <view class="item width-40">
-          <text class="name">{{item.name}}</text>
-          <text class="code">{{item.code}}</text>
+    <scroll-view scroll-y="true" style="height: {{winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+      <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value[select_id]}}" data-item="item">
+        <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
+          <view class="item width-40">
+            <text class="name">{{item.name}}</text>
+            <text class="code">{{item.code}}</text>
+          </view>
+          <text class="width-20">{{item.current}}</text>
+          <text class="width-20">{{item.quoteChange}}%</text>
+          <text class="width-20">{{item.change}}</text>
         </view>
-        <text class="width-20">{{item.current}}</text>
-        <text class="width-20">{{item.quoteChange}}%</text>
-        <text class="width-20">{{item.change}}</text>
-      </view>
-    </navigator>
+      </navigator>
+    </scroll-view>
   </view>
 
   <!-- 搜索遮罩 -->

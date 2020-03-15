@@ -20,11 +20,12 @@
 .head .title {
   font-size: 20px;
   font-weight: bold;
+  margin-left: 10px;
 }
 
 .head .seach {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   margin-right: 5%;
 }
 
@@ -38,6 +39,10 @@
   background: #0c090a;
   padding: 7px 0;
   /*border: 1px solid grey;*/
+}
+
+.preview .pre-items {
+  margin: 5px 0;
 }
 
 .pre-opt, .pre-items {
@@ -85,6 +90,10 @@
   color: green;
 }
 
+.col-blue {
+  color: #04f;
+}
+
 .pre-item .pre-name {
   font-size: 14px;
   color: white;
@@ -112,7 +121,7 @@
   width: 95%;
   display: flex;
   padding: 10rpx 2.5%;
-  background: grey;
+  background: #0e0e0e;
 }
 
 .opt-icon {
