@@ -44,7 +44,7 @@
       </view>
     </view>
     <scroll-view scroll-y="true" style="height: {{winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
-      <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value[select_id]}}" data-item="item">
+      <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
           <view class="item width-40">
             <text class="name">{{item.name}}</text>
@@ -54,7 +54,8 @@
           <text class="width-20">{{item.quoteChange}}%</text>
           <text class="width-20">{{item.change}}</text>
         </view>
-      </navigator>
+        <!-- <view class="add_myself">加入自选</view> -->
+      </view>
     </scroll-view>
   </view>
 
@@ -70,13 +71,13 @@
 
   <!-- 侧边框 -->
   <view class="sidebar" style="left: {{is_sidebar?'0':'-200px'}}">
-    <view class="user">
-      <image class="user-img" src="../../icon/user-unlogin.png"></image>
+    <button class="user" open-type="getUserInfo" bindgetuserinfo="onGetUserInfo" size="default">
+      <image class="user-img" src="{{avatarUrl}}"></image>
       <view class="user-inf">
-        <view>点击登录</view>
+        <view>{{nickName}}</view>
         <!-- <view>ID:as1s2da3d5s35as6</view> -->
       </view>
-    </view>
+    </button>
     <view class="item-is" bindtap="closeAll">行情数据</view>
     <view class="item" bindtap="showMore">自选内容</view>
     <view class="about">

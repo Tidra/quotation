@@ -1,6 +1,7 @@
 // miniprogram/pages/details/details.js
 import uCharts from '../../unit/u-charts.js';
 var db = require("../../unit/db.js");
+const app = getApp()
 
 //定义记录初始屏幕宽度比例，便于初始化
 var _self;
@@ -56,6 +57,60 @@ Page({
     this.setData({
       code: options.code,
     });
+  },
+
+  //加入自选
+  addMy: function() {
+    var that = this;
+    if (app.globalData.openid) {
+      wx.showModal({
+        title: '',
+        content: '是否确定加入到自选股票',
+        success(res) {
+          if (res.confirm) {
+            that.onAdd();
+            console.log('用户点击确定');
+          } else if (res.cancel) {
+            console.log('用户点击取消');
+          }
+        }
+      })
+    } else {
+      wx.showToast({
+        icon: 'none',
+        title: '您尚未登录',
+      })
+    }
+  },
+
+  //加入到数据库
+  onAdd: function() {
+    const db = wx.cloud.database();
+    var that = this;
+    db.collection('joinquant').add({
+      data: {
+        code: that.data.code,
+        name: that.data.value.name,
+        date: that.data.value.date
+      },
+      success: res => {
+        // 在返回结果中会包含新创建的记录的 _id
+        this.setData({
+          counterId: res._id,
+        })
+        wx.showToast({
+          title: '添加成功',
+        })
+        console.log('[数据库] [新增记录] 成功，记录 _id: ', res._id)
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '添加失败'
+        })
+        console.error('[数据库] [新增记录] 失败：', err)
+      }
+    })
   },
 
   // 选择显示图表
@@ -300,7 +355,6 @@ Page({
           title: '网络错误',
           icon: 'none',
           duration: 2000 //持续的时间
-
         })
       });
     setTimeout(function() {
@@ -342,7 +396,7 @@ Page({
           title: '成交量(万手)',
           format: (val) => {
             var val = val / 10000;
-            if(val < 100){
+            if (val < 100) {
               return val.toFixed(2);
             }
             return val.toFixed(0)
@@ -406,9 +460,9 @@ Page({
         gridType: 'dash',
         splitNumber: 5,
         format: (val) => {
-          if(val < 100){
+          if (val < 100) {
             return val.toFixed(2)
-          }else if(val < 1000){
+          } else if (val < 1000) {
             return val.toFixed(1)
           }
           return val.toFixed(0)

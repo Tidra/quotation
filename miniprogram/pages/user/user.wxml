@@ -3,7 +3,7 @@
 
   <!--头部-->
   <view class="head">
-    <image class="more" src='/icon/more.png' mode="aspectFit"></image>
+    <image class="more" src='/icon/home.png' mode="aspectFit" bindtap="toHome"></image>
     <label class="title">自选</label>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>

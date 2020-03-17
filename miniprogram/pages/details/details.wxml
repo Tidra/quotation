@@ -5,6 +5,7 @@
     <view class="title">{{value.name}}
       <text class="code">{{value.code}}</text>
     </view>
+    <image class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
   <view class="data">

@@ -1,22 +1,33 @@
 // miniprogram/pages/user/user.js
+var db = require("../../unit/db.js");
+const app = getApp()
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    openid: '',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
     is_hide: 'none',
     select_id: 'gupiao',
     value: {
-      gupiao:[],
-      jijin:[]
+      gupiao: [],
+      jijin: []
     },
   },
 
+  //跳到主页
+  toHome: function() {
+    wx.navigateBack({
+      delta: 2
+    })
+  },
+
   // 显示搜索框
-  seachIs: function () {
+  seachIs: function() {
     var is_hide = 'none';
     if (this.data.is_hide == 'none') {
       is_hide = 'flex';
@@ -26,10 +37,10 @@ Page({
     })
   },
 
-  seach: function (e) {
+  seach: function(e) {
     this.seachIs();
     var seach_value = "";
-    if (typeof (e.detail.value) == 'string') {
+    if (typeof(e.detail.value) == 'string') {
       seach_value = e.detail.value;
     } else {
       seach_value = e.detail.value.seach_value;
@@ -40,7 +51,7 @@ Page({
   },
 
   // 选择显示
-  select: function (e) {
+  select: function(e) {
     this.setData({
       select_id: e.currentTarget.id,
       sort_by: 'comprehensive',
@@ -51,7 +62,7 @@ Page({
   },
 
   // 排序
-  sort: function (e) {
+  sort: function(e) {
     console.log(e.currentTarget.id);
     var sort_by = this.data.sort_by;
     var sort_icon = ['up-down', 'up-down', 'up-down'];
@@ -95,65 +106,158 @@ Page({
   },
 
   //触底添加数据
-  bottomReLoad: function () {
+  bottomReLoad: function() {
     // this.dataLoad(this.data.select_id, this.data.sort_by, this.data.page + 1);
+  },
+
+  //查询自选
+  onQuery: function() {
+    const db = wx.cloud.database()
+    // 查询当前用户所有的 counters
+    db.collection('joinquant').where({
+      _openid: this.data.openid
+    }).get({
+      success: res => {
+        this.setData({
+          queryResult: res.data
+        })
+        console.log('[数据库] [查询记录] 成功: ', res)
+        this.select()
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '查询记录失败'
+        })
+        console.error('[数据库] [查询记录] 失败：', err)
+      }
+    })
+  },
+
+  //查询单个数据
+  select: function() {
+    this.setData({
+      value: {
+        gupiao: [],
+        jijin: []
+      }
+    })
+    var queryResult = this.data.queryResult;
+    for (var i in queryResult) {
+      db.getData.selectByCode(queryResult[i].code, 'day', '1').then(res => {
+          //请求成功
+          var data = {
+            code: res.data[0].code,
+            name: res.data[0].name,
+            current: res.data[0].closingPrice,
+            previousClose: res.data[0].previousClose,
+            quoteChange: res.data[0].quoteChange,
+            change: res.data[0].change
+          };
+          var value = this.data.value;
+          value.gupiao.push(data);
+          this.setData({
+            value
+          })
+        })
+        .catch(err => {
+          //请求失败
+          value.gupiao.push(queryResult[0])
+          wx.showToast({
+            title: queryResult[0].name + '获取错误',
+            icon: 'none'
+          })
+        });
+    }
+  },
+
+  onGetOpenid: function() {
+    var that = this;
+    // 调用云函数
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {},
+      success: res => {
+        console.log('[云函数] [login] user openid: ', res.result.openid);
+        app.globalData.openid = res.result.openid;
+        that.setData({
+          openid: res.result.openid
+        });
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success',
+          duration: 2000 //持续的时间
+        });
+      },
+      fail: err => {
+        console.error('[云函数] [login] 调用失败', err)
+      }
+    })
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function(options) {
     this.setData({
       winHeight: wx.getSystemInfoSync().windowHeight - 123
     })
+    if (app.globalData.openid) {
+      this.setData({
+        openid: app.globalData.openid
+      })
+    } else {
+      this.onGetOpenid()
+    }
+    this.onQuery()
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function () {
+  onReady: function() {
 
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
+  onShow: function() {
 
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
-  onHide: function () {
+  onHide: function() {
 
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
-  onUnload: function () {
+  onUnload: function() {
 
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function () {
-
+  onPullDownRefresh: function() {
+    this.onQuery()
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
-  onReachBottom: function () {
+  onReachBottom: function() {
 
   },
 
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function () {
+  onShareAppMessage: function() {
 
   }
 })
