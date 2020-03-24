@@ -58,7 +58,7 @@ Page({
       sort_icon: ['up-down', 'up-down', 'up-down'],
       page: 1
     })
-    // this.dataLoad(e.currentTarget.id, 'comprehensive', 1)
+    this.orderSort(e.currentTarget.id, 'comprehensive');
   },
 
   // 排序
@@ -72,12 +72,11 @@ Page({
       }
       sort_by = 'comprehensive';
     } else if (e.currentTarget.id == "sort2") {
-      if (sort_by == 'closingPriceDrop') {
-        console.log(sort_by)
-        sort_by = 'closingPriceRise';
+      if (sort_by == 'currentDrop') {
+        sort_by = 'currentRise';
         sort_icon[0] = 'up';
       } else {
-        sort_by = 'closingPriceDrop';
+        sort_by = 'currentDrop';
         sort_icon[0] = 'down';
       }
     } else if (e.currentTarget.id == "sort3") {
@@ -102,13 +101,35 @@ Page({
       sort_icon,
       page: 1,
     });
-    // this.dataLoad(this.data.select_id, sort_by, 1)
+    this.orderSort(this.data.select_id, sort_by)
+  },
+
+  orderSort: function(group, sort_by) {
+    var value = this.data.value;
+    var order = sort_by.slice(-4);
+    sort_by = sort_by.slice(0, -4);
+    if (order == 'Drop') {
+      value[group].sort((a, b) => {
+        return b[sort_by] - a[sort_by];
+      });
+    } else if (order == 'Rise') {
+      value[group].sort((a, b) => {
+        return a[sort_by] - b[sort_by];
+      });
+    } else {
+      value[group].sort((a, b) => {
+        return a.code.localeCompare(b.code);
+      });
+    }
+    this.setData({
+      value
+    });
   },
 
   //触底添加数据
-  bottomReLoad: function() {
-    // this.dataLoad(this.data.select_id, this.data.sort_by, this.data.page + 1);
-  },
+  // bottomReLoad: function() {
+  //   this.orderSort(this.data.select_id, this.data.sort_by);
+  // },
 
   //查询自选
   onQuery: function() {
@@ -119,10 +140,12 @@ Page({
     }).get({
       success: res => {
         this.setData({
-          queryResult: res.data
+          queryResult: res.data,
+          sort_by: 'comprehensive',
+          sort_icon: ['up-down', 'up-down', 'up-down'],
         })
         console.log('[数据库] [查询记录] 成功: ', res)
-        this.select()
+        this.selectData()
       },
       fail: err => {
         wx.showToast({
@@ -135,7 +158,7 @@ Page({
   },
 
   //查询单个数据
-  select: function() {
+  selectData: function() {
     this.setData({
       value: {
         gupiao: [],

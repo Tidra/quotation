@@ -134,6 +134,7 @@
 .qiun-charts {
   width: 100%;
   background: #0e0e0e;
+  position: relative;
 }
 
 .chartsCandle {
@@ -146,6 +147,34 @@
   width: 100%;
   height: 130px;
   background: #0e0e0e;
+}
+
+.all-zoom{
+  position: absolute;
+  top: 0;
+  left: 50px;
+}
+
+.zoom{
+  width: 12px;
+  height: 12px;
+  background: #638cfc63;
+  border: 1px solid #04f;
+  border-radius: 100%;
+  padding: 5px;
+  margin: 5px;
+  float: left;
+}
+
+.no-zoom{  
+  width: 12px;
+  height: 12px;
+  background: #638cfc00;
+  border: 1px solid #bfbfbf;
+  border-radius: 100%;
+  padding: 5px;
+  margin: 5px;
+  float: right;
 }
 
 /* 遮罩 */

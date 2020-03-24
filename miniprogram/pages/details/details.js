@@ -16,6 +16,7 @@ Page({
    */
   data: {
     itemCount: 20,
+    count: 20,
     is_hide: 'none',
     select_id: 'dk',
     /**
@@ -340,11 +341,13 @@ Page({
         console.log(all_value)
         // 隐藏加载框
         wx.hideLoading()
+        this.chartsItemCount = all_value.categories.length;
 
         this.setData({
           value,
           all_value,
-          itemCount: all_value.categories.length
+          itemCount: all_value.categories.length,
+          count: all_value.categories.length
         });
         _self.showCandle("canvasCandle", all_value);
         _self.showColumn("canvasColumn", all_value);
@@ -419,17 +422,23 @@ Page({
 
   },
   touchEndColumn(e) {
-    canvaColumn.scrollEnd(e);
-    canvaCandle.scrollEnd(e);
-    canvaColumn.showToolTip(e, {
-      format: function(item, category) {
-        if (typeof item.data === 'object') {
-          return category + ' ' + item.name + ':' + item.data.value
-        } else {
-          return category + ' ' + item.name + ':' + item.data
+    if (e.touches.length == 0) {
+      canvaColumn.scrollEnd(e);
+      canvaCandle.scrollEnd(e);
+      canvaColumn.showToolTip(e, {
+        format: function(item, category) {
+          if (typeof item.data === 'object') {
+            return category + ' ' + item.name + ':' + item.data.value
+          } else {
+            return category + ' ' + item.name + ':' + item.data
+          }
         }
-      }
-    });
+      });
+    } else {
+      this.setData({
+        count: this.chartsItemCount
+      })
+    }
   },
 
   /**
@@ -452,7 +461,7 @@ Page({
         disableGrid: true,
         itemCount: chartData.categories.length,
         // scrollShow: true,
-        // scrollAlign: 'right',
+        scrollAlign: 'right',
         labelCount: 4,
       },
       yAxis: {
@@ -506,26 +515,71 @@ Page({
     });
   },
   touchCandle(e) {
-    canvaCandle.scrollStart(e);
-    canvaColumn.scrollStart(e);
+    if (e.touches.length == 1) {
+      canvaCandle.scrollStart(e);
+      canvaColumn.scrollStart(e);
+    } else if (e.touches.length == 2) {
+      this.touchNum = Math.floor(Math.abs(e.touches[0].x - e.touches[1].x));
+    }
+    this.lastMoveTime = Date.now();
   },
   moveCandle(e) {
-    canvaCandle.scroll(e);
-    canvaColumn.scroll(e);
+    let currMoveTime = Date.now();
+    let duration = currMoveTime - this.lastMoveTime;
+    if (duration < Math.floor(1000 / 60)) return;
+    this.lastMoveTime = currMoveTime;
+    if (e.touches.length == 1) {
+      canvaCandle.scroll(e);
+      canvaColumn.scroll(e);
+    } else if (e.touches.length == 2) {
+      var len = Math.abs(e.touches[0].x - e.touches[1].x);
+      if (Math.abs(len - this.touchNum) < 10) return;
+      this.chartsItemCount = this.chartsItemCount + Math.floor((this.touchNum - len) / 10);
+      if (this.chartsItemCount < 5) {
+        this.chartsItemCount = 5;
+      } else if (this.chartsItemCount > this.data.itemCount) {
+        this.chartsItemCount = this.data.itemCount;
+      }
+      setTimeout(() => {
+        this.zoomCandle(this.chartsItemCount);
+      }, 200);
+      this.touchNum = len;
+    }
   },
   touchEndCandle(e) {
-    canvaColumn.scrollEnd(e);
-    canvaCandle.scrollEnd(e);
-    //下面是toolTip事件，如果滚动后不需要显示，可不填写
-    canvaCandle.showToolTip(e, {
-      format: function(item, category) {
-        return category + ' ' + item.name + ':' + item.data
-      }
-    });
+    console.log(e)
+    if (e.touches.length == 0) {
+      canvaColumn.scrollEnd(e);
+      canvaCandle.scrollEnd(e);
+      //下面是toolTip事件，如果滚动后不需要显示，可不填写
+      canvaCandle.showToolTip(e, {
+        format: function(item, category) {
+          return category + ' ' + item.name + ':' + item.data
+        }
+      });
+    } else {
+      this.setData({
+        count: this.chartsItemCount
+      })
+    }
   },
-  sliderMove(e) {
-    _self.itemCount = e.detail.value;
-    _self.zoomCandle(e.detail.value);
+  changeCount(e) {
+    var count = this.data.count;
+    if (e.currentTarget.id == 'jia'){
+      if(count == this.data.itemCount){
+        return;
+      }
+      count += 1;
+    }else{
+      if (count == 5) {
+        return;
+      }
+      count -= 1;
+    }
+    this.setData({
+      count
+    });
+    _self.zoomCandle(count);
   },
   zoomCandle(val) {
     canvaCandle.zoom({

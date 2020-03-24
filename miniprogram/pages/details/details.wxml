@@ -81,15 +81,17 @@
       <text id="dk" class="{{select_id=='dk'?'pic-sel':'pic-nosel'}}" bindtap="select">日K</text>
       <text id="wk" class="{{select_id=='wk'?'pic-sel':'pic-nosel'}}" bindtap="select">周K</text>
       <text id="mk" class="{{select_id=='mk'?'pic-sel':'pic-nosel'}}" bindtap="select">月K</text>
-      <text id="mh" class="{{select_id=='mh'?'pic-sel':'pic-nosel'}}" bindtap="select">分时</text>
+      <text id="mh" class="{{select_id=='mh'?'pic-sel':'pic-nosel'}}" bindtap="select">自选</text>
     </view>
     <!--折线图-->
     <view class="qiun-charts">
       <canvas canvas-id="canvasCandle" id="canvasCandle" class="chartsCandle" disable-scroll="true" bindtouchstart="touchCandle" bindtouchmove="moveCandle" bindtouchend="touchEndCandle"></canvas>
       <canvas canvas-id="canvasColumn" id="canvasColumn" class="chartsColumn" bindtouchstart="touchCandle" bindtouchmove="moveCandle" bindtouchend="touchEndColumn"></canvas>
-      <view class="qiun-padding qiun-bg-white ">
-        <slider value="{{itemCount}}" min="5" max="{{itemCount}}" block-color="#f8f8f8" block-size="18" bindchanging="sliderMove" bindchange="sliderMove" />
-      </view>
+      <cover-view class="all-zoom">
+        <cover-image id="jian" class="{{count<=5?'no-zoom':'zoom'}}" src="../../icon/jian.png" bindtap="{{count<=5?'':'changeCount'}}"></cover-image>
+        <cover-image id="jia" class="{{count>=itemCount?'no-zoom':'zoom'}}" src="../../icon/jia.png" bindtap="{{count>=itemCount?'':'changeCount'}}"></cover-image>
+        <!-- <slider value="{{itemCount}}" min="5" max="{{itemCount}}" block-color="#f8f8f8" block-size="18" bindchanging="sliderMove" bindchange="sliderMove" /> -->
+      </cover-view>
     </view>
   </view>
 

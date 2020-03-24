@@ -59,7 +59,7 @@
 
 .pre-opt .opt-yes {
   width: 20%;
-  color: blue;
+  color: #04f;
   text-align: center;
   position: relative;
 }
@@ -70,7 +70,7 @@
   display: block;
   bottom: -6px;
   height: 9rpx;
-  background: blue;
+  background: #04f;
   right: 35%;
   left: 35%;
   border-radius: 69rpx;

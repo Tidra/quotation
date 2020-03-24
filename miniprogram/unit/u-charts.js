@@ -5010,6 +5010,7 @@ var Charts = function Charts(opts) {
   opts.$this = opts.$this ? opts.$this : this;
   
   this.context = wx.createCanvasContext(opts.canvasId, opts.$this);
+  
   /* 兼容原生H5
   this.context = document.getElementById(opts.canvasId).getContext("2d");
   this.context.setStrokeStyle = function(e){ return this.strokeStyle=e; }
