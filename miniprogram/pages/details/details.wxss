@@ -12,6 +12,7 @@
 }
 
 .head .title {
+  width: 250px;
   font-size: 75rpx;
   color: white;
 }
@@ -98,6 +99,37 @@
   margin: 5rpx 0;
 }
 
+.row-button {
+  width: 10%;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rpx;
+  margin-left: 12%;
+  padding: 3rpx 5% 5rpx 5%;
+  background: #242424;
+}
+
+.row-line {
+  width: 100%;
+  height: 3px;
+  background: #242424;
+}
+
+.down-data .row-two {
+  width: 40%;
+  display: flex;
+  justify-content: space-between;
+  margin: 5rpx 0;
+}
+
+.down-data .row-oneline {
+  width: 45%;
+  display: flex;
+  justify-content: space-between;
+  margin: 5rpx 0;
+  padding-right: 50%;
+}
+
 /* 图例 */
 
 .pic {
@@ -130,51 +162,17 @@
 }
 
 /* 图 */
+.chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+} 
 
-.qiun-charts {
+ec-canvas {
   width: 100%;
-  background: #0e0e0e;
-  position: relative;
-}
-
-.chartsCandle {
-  width: 100%;
-  height: 232px;
-  background: #0e0e0e;
-}
-
-.chartsColumn {
-  width: 100%;
-  height: 130px;
-  background: #0e0e0e;
-}
-
-.all-zoom{
-  position: absolute;
-  top: 0;
-  left: 50px;
-}
-
-.zoom{
-  width: 12px;
-  height: 12px;
-  background: #638cfc63;
-  border: 1px solid #04f;
-  border-radius: 100%;
-  padding: 5px;
-  margin: 5px;
-  float: left;
-}
-
-.no-zoom{  
-  width: 12px;
-  height: 12px;
-  background: #638cfc00;
-  border: 1px solid #bfbfbf;
-  border-radius: 100%;
-  padding: 5px;
-  margin: 5px;
-  float: right;
+  height: 410px;
 }
 
 /* 遮罩 */

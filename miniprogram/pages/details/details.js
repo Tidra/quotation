@@ -1,13 +1,316 @@
 // miniprogram/pages/details/details.js
-import uCharts from '../../unit/u-charts.js';
 var db = require("../../unit/db.js");
-const app = getApp()
+import * as echarts from '../../ec-canvas/echarts';
+import '../../ec-canvas/darkin';
+const app = getApp();
 
-//定义记录初始屏幕宽度比例，便于初始化
-var _self;
-var canvaColumn = null;
-var canvaLine = null;
-var canvaCandle = null;
+let chart = null;
+
+var upColor = '#ec0000';
+var upBorderColor = '#8A0000';
+var downColor = '#00da3c';
+var downBorderColor = '#008F28';
+var guData = {
+  "categoryData": [],
+  "values": [],
+  "volumes": []
+};
+
+function setOption(chart, data, name) {
+  var option = {
+    dataset: {
+      source: data
+    },
+    legend: {
+      top: 30,
+      left: 'center',
+      data: [name, 'MA5', 'MA10', 'MA20', 'MA30'],
+    },
+    title: {
+      text: '最近' + data.categoryData.length + name[0] + '数据'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        animation: false,
+        type: 'cross'
+      }
+    },
+    toolbox: {
+      feature: {
+        myTool1: {
+          show: true,
+          title: '放大图表',
+          icon: 'path://M31.258 146.356c0-66.102 54.083-120.185 120.185-120.185h721.114c66.102 0 120.185 54.083 120.185 120.185V867.47c0 66.102-54.083 120.186-120.185 120.186H151.443c-66.102 0-120.185-54.084-120.185-120.186V146.356z m60.093 0V867.47c0 30.047 24.037 60.093 60.092 60.093h721.114c30.046 0 60.092-24.037 60.092-60.093V146.356c0-30.046-24.037-60.093-60.092-60.093H151.443c-36.055 0-60.092 24.037-60.092 60.093z M271.629 506.913c0-18.028 12.018-30.047 30.046-30.047h420.65c18.028 0 30.046 12.019 30.046 30.047s-12.018 30.046-30.046 30.046h-420.65c-18.028 0-30.046-12.018-30.046-30.046z M512 266.542c18.028 0 30.046 12.018 30.046 30.046v420.65c0 18.027-12.018 30.046-30.046 30.046s-30.046-12.019-30.046-30.046v-420.65c0-18.028 12.018-30.046 30.046-30.046z',
+          onclick: function() {
+            var start = chart._model.option.dataZoom[0].start;
+            var end = chart._model.option.dataZoom[0].end;
+            var newStart = start < end - 5 ? start + 5 : start;
+            var newEnd = end > newStart + 5 ? end - 5 : end;
+            chart.dispatchAction({
+              type: 'dataZoom',
+              dataZoomIndex: [0, 1],
+              start: newStart,
+              end: newEnd
+            });
+          }
+        },
+        myTool2: {
+          show: true,
+          title: '缩小图表',
+          icon: 'path://M904 64c30.9 0 56 25.1 56 56v784c0 30.9-25.1 56-56 56H120c-30.9 0-56-25.1-56-56V120c0-30.9 25.1-56 56-56h784m0-64H120C53.7 0 0 53.7 0 120v784c0 66.3 53.7 120 120 120h784c66.3 0 120-53.7 120-120V120c0-66.3-53.7-120-120-120z M736 480H288c-17.7 0-32 14.3-32 32s14.3 32 32 32h448c17.7 0 32-14.3 32-32s-14.3-32-32-32z',
+          onclick: function() {
+            var start = chart._model.option.dataZoom[0].start;
+            var end = chart._model.option.dataZoom[0].end;
+            var newStart = start > 5 ? start - 5 : 0;
+            var newEnd = end < 95 ? end + 5 : 100;
+            chart.dispatchAction({
+              type: 'dataZoom',
+              dataZoomIndex: [0, 1],
+              start: newStart,
+              end: newEnd
+            });
+          }
+        },
+        dataZoom: {
+          yAxisIndex: false
+        },
+        restore: {
+          show: true
+        }
+      }
+    },
+    grid: [{
+        left: '13%',
+        right: '5%',
+        bottom: 150
+      },
+      {
+        left: '13%',
+        right: '5%',
+        height: 80,
+        bottom: 40
+      }
+    ],
+    xAxis: [{
+        type: 'category',
+        data: data.categoryData,
+        scale: true,
+        // boundaryGap: false,
+        // inverse: true,
+        axisLine: {
+          onZero: false
+        },
+        splitLine: {
+          show: false
+        },
+        splitNumber: 20,
+        min: 'dataMin',
+        max: 'dataMax'
+      },
+      {
+        type: 'category',
+        gridIndex: 1,
+        data: data.categoryData,
+        scale: true,
+        // boundaryGap: false,
+        position: 'top',
+        axisLine: {
+          onZero: false
+        },
+        // axisTick: {show: false},
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          show: false
+        },
+        splitNumber: 20,
+        min: 'dataMin',
+        max: 'dataMax'
+      }
+    ],
+    yAxis: [{
+        scale: true,
+        splitArea: {
+          show: true
+        }
+      },
+      {
+        name: '成交量',
+        nameLocation: 'center',
+        scale: true,
+        gridIndex: 1,
+        splitNumber: 2,
+        axisLabel: {
+          show: false
+        },
+        // axisLine: {show: false},
+        axisTick: {
+          show: false
+        },
+        // splitLine: {show: false}
+      }
+    ],
+    dataZoom: [{
+        type: 'inside',
+        xAxisIndex: [0, 1],
+        start: 0,
+        end: 100,
+        minValueSpan: 5,
+      },
+      {
+        show: true,
+        xAxisIndex: [0, 1],
+        type: 'slider',
+        bottom: 5,
+        start: 0,
+        end: 100,
+        minValueSpan: 5,
+        handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        handleSize: '105%'
+      }
+    ],
+    visualMap: {
+      show: false,
+      seriesIndex: 5,
+      dimension: 2,
+      pieces: [{
+        value: 1,
+        color: upColor
+      }, {
+        value: -1,
+        color: downColor
+      }]
+    },
+    series: [{
+        type: 'candlestick',
+        name: name,
+        data: data.values,
+        itemStyle: {
+          color: upColor,
+          color0: downColor,
+          borderColor: upBorderColor,
+          borderColor0: downBorderColor
+        },
+      },
+      {
+        name: 'MA5',
+        type: 'line',
+        data: calculateMA(5, data.values),
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+      {
+        name: 'MA10',
+        type: 'line',
+        data: calculateMA(10, data.values),
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+      {
+        name: 'MA20',
+        type: 'line',
+        data: calculateMA(20, data.values),
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+      {
+        name: 'MA30',
+        type: 'line',
+        data: calculateMA(30, data.values),
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+      {
+        name: 'Volumn',
+        type: 'bar',
+        data: data.volumes,
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        large: true,
+      },
+      {
+        name: 'MA5',
+        type: 'line',
+        data: calculateMA(5, data.volumes),
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+      {
+        name: 'MA10',
+        type: 'line',
+        data: calculateMA(10, data.volumes),
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1
+        }
+      },
+    ]
+  };
+
+  try {
+    chart.setOption(option);
+    chart.dispatchAction({
+      type: 'dataZoom',
+      dataZoomIndex: [0, 1],
+      start: 10,
+      end: 100
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function initChart(canvas, width, height, dpr) {
+  var that = this;
+  chart = echarts.init(canvas, 'darkin', {
+    width: width,
+    height: height,
+    devicePixelRatio: dpr // new
+  });
+  canvas.setChart(chart);
+
+  setOption(chart, guData, '日')
+
+  return chart;
+}
+
+function calculateMA(dayCount, data) {
+  var result = [];
+  for (var i = 0, len = data.length; i < len; i++) {
+    if (i < dayCount) {
+      result.push('-');
+      continue;
+    }
+    var sum = 0;
+    for (var j = 0; j < dayCount; j++) {
+      sum += data[i - j][1];
+    }
+    result.push((sum / dayCount).toFixed(3));
+  }
+  return result;
+}
 
 Page({
 
@@ -15,10 +318,13 @@ Page({
    * 页面的初始数据
    */
   data: {
-    itemCount: 20,
-    count: 20,
+    ec: {
+      onInit: initChart
+    },
+    itime: 1500,
     is_hide: 'none',
     select_id: 'dk',
+    more_data: false,
     /**
      * code:代码
      * name:名称
@@ -48,16 +354,28 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    _self = this;
-    this.cWidth = wx.getSystemInfoSync().windowWidth;
-    this.cHeight = 250;
+    var type = 'other';
+    if (options.type == 'hushen')
+      type = 'gupiao_data';
+    else if (options.type == 'uss')
+      type = 'USA_stock_data';
+    else if (options.type == 'fund')
+      type = 'jijin_data';
 
-    this.dataLoad(options.code, 'day', 30);
+    this.dataLoad(type, options.code, 'day', 30);
 
     // 具体数据、屏幕宽度
     this.setData({
       code: options.code,
+      type
     });
+  },
+
+  //显示更多数据
+  moreData: function() {
+    this.setData({
+      more_data: !this.data.more_data
+    })
   },
 
   //加入自选
@@ -70,10 +388,7 @@ Page({
         success(res) {
           if (res.confirm) {
             that.onAdd();
-            console.log('用户点击确定');
-          } else if (res.cancel) {
-            console.log('用户点击取消');
-          }
+          } else if (res.cancel) {}
         }
       })
     } else {
@@ -123,15 +438,15 @@ Page({
       select_id: e.currentTarget.id
     });
     if (e.currentTarget.id == "fd") {
-      this.dataLoad(this.data.code, 'day', 5);
+      this.dataLoad(this.data.type, this.data.code, 'day', 5);
     } else if (e.currentTarget.id == "dk") {
-      this.dataLoad(this.data.code, 'day', 30);
+      this.dataLoad(this.data.type, this.data.code, 'day', 30);
     } else if (e.currentTarget.id == "wk") {
-      this.dataLoad(this.data.code, 'week', 5 * 30);
+      this.dataLoad(this.data.type, this.data.code, 'week', 5 * 30);
     } else if (e.currentTarget.id == "mk") {
-      this.dataLoad(this.data.code, 'month', 31 * 30);
+      this.dataLoad(this.data.type, this.data.code, 'month', 31 * 30);
     } else if (e.currentTarget.id == "mh") {
-      this.dataLoad(this.data.code, 'day', 5);
+      this.dataLoad(this.data.type, this.data.code, 'day', 5);
     }
   },
 
@@ -165,29 +480,17 @@ Page({
     if (num == undefined) {
       return ''
     }
-    if (parseInt(parseInt(num / 100000000) / 10000) > 0) {
-      if (type == 'type') {
-        return [1000000000000, '万亿']
-      }
+    if (Math.floor(num / 1000000000000) > 0) {
       var newNum = (num / 1000000000000).toFixed(2) + '万亿';
       return newNum;
     }
-    if (parseInt(num / 100000000) > 0) {
-      if (type == 'type') {
-        return [100000000, '亿']
-      }
+    if (Math.floor(num / 100000000) > 0) {
       var newNum = (num / 100000000).toFixed(2) + '亿';
       return newNum;
     }
-    if (parseInt(num / 10000) > 0) {
-      if (type == 'type') {
-        return [10000, '万']
-      }
+    if (Math.floor(num / 10000) > 0) {
       var newNum = (num / 10000).toFixed(2) + '万';
       return newNum;
-    }
-    if (type == 'type') {
-      return [1, '']
     }
     return num
   },
@@ -226,11 +529,13 @@ Page({
   },
   //各单位
   getTypeData: function(data, type) {
+    var name = '日K';
     var newData = {};
     var typeFunc = function(date) {
       return date
     };
     if (type == "week") {
+      name = '周K';
       typeFunc = function(date) {
         let d1 = new Date(date);
         let d2 = new Date(date);
@@ -242,6 +547,7 @@ Page({
         return date.substring(0, 4) + (Array(2).join("0") + num).slice(-2);
       }
     } else if (type == "month") {
+      name = '月K';
       typeFunc = function(date) {
         date = date.split("-");
         return date[0] + "-" + date[1];
@@ -266,57 +572,70 @@ Page({
       }
     }
 
-    return {
-      categories: (newData => {
+    var all_value = {
+      categoryData: (newData => {
         var arr = [];
         for (var i in newData) {
           arr.push(i);
         }
         return arr;
       })(newData),
-      seriesCandle: [{
-        name: data[0].name,
-        data: (newData => {
-          var arr = [];
-          for (var i in newData) {
-            var e = newData[i];
-            var openingPrice = this.mathOS(e.openingPrice, 'frist');
-            var closingPrice = this.mathOS(e.closingPrice, 'last');
-            var minPrice = this.mathOS(e.minPrice, 'min');
-            var maxPrice = this.mathOS(e.maxPrice, 'max');
-            arr.push([openingPrice, closingPrice, minPrice, maxPrice]);
-          }
-          return arr;
-        })(newData)
-      }],
-      seriesColumn: [{
-        name: data[0].name,
-        data: (newData => {
-          var arr = [];
-          for (var i in newData) {
-            var e = newData[i];
-            var volume = this.mathOS(e.volume, 'sum');
-            arr.push(volume);
-          }
-          return arr;
-        })(newData)
-      }]
+      values: (newData => {
+        var arr = [];
+        for (var i in newData) {
+          var e = newData[i];
+          var openingPrice = this.mathOS(e.openingPrice, 'frist');
+          var closingPrice = this.mathOS(e.closingPrice, 'last');
+          var minPrice = this.mathOS(e.minPrice, 'min');
+          var maxPrice = this.mathOS(e.maxPrice, 'max');
+          arr.push([openingPrice, closingPrice, minPrice, maxPrice]);
+        }
+        return arr;
+      })(newData),
+      volumes: (newData => {
+        var arr = [];
+        for (var i in newData) {
+          var e = newData[i];
+          var volume = this.mathOS(e.volume, 'sum');
+          var color = this.mathOS(e.openingPrice, 'frist') > this.mathOS(e.closingPrice, 'last') ? -1 : 1;
+          arr.push([i, volume, color]);
+        }
+        return arr;
+      })(newData)
     };
+
+    guData = all_value;
+    try {
+      setOption(chart, guData, name);
+    } catch (e) {
+      console.log(e)
+    }
+
+    return all_value;
   },
 
 
   //数据获取
-  dataLoad: function(code, date_unit, num) {
+  dataLoad: function(type, code, date_unit, num) {
     // 显示加载图标
     wx.showLoading({
       title: '玩命加载中',
     })
-    db.getData.selectByCode(code, date_unit, num).then(res => {
+    db.getData.selectByCode(type, code, date_unit, num).then(res => {
         //请求成功
+        console.log(res.data[0])
         var changeUnit = this.changeUnit;
+        var size = 75;
+        var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
+        if (len > 16) {
+          size = 55;
+        } else if (len > 10) {
+          size = 75 - (len - 10) * 4;
+        }
         var value = {
           code: res.data[0].code,
           name: res.data[0].name,
+          size: size,
           date: res.data[0].date,
           current: res.data[0].closingPrice,
           previousClose: res.data[0].previousClose,
@@ -328,29 +647,24 @@ Page({
           maxPrice: res.data[0].maxPrice,
           minPrice: res.data[0].minPrice,
           turnover: changeUnit(res.data[0].turnover),
-          sell: '23.85万',
-          buy: '25.58万',
           totalMarketCapitaliza: changeUnit(res.data[0].totalMarketCapitalization),
-          pe: 777.85,
-          amplitude: ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
+          pe: res.data[0].per,
+          qrr: res.data[0].qrr,
+          pbr: res.data[0].pbr,
+          ttm: res.data[0].ttm > 0 ? res.data[0].ttm.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3') : null,
+          eps: res.data[0].eps ? res.data[0].eps.toFixed(2) : '',
+          navps: res.data[0].navps ? res.data[0].navps.toFixed(2) : '',
+          amplitude: res.data[0].amplitude || ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
           marketCapitalization: changeUnit(res.data[0].marketCapitalization)
         };
-        var all_value = res.data.reverse();
-
-        all_value = this.getTypeData(all_value, date_unit);
-        console.log(all_value)
-        // 隐藏加载框
-        wx.hideLoading()
-        this.chartsItemCount = all_value.categories.length;
-
+        var all_value = this.getTypeData(res.data.reverse(), date_unit);
+        console.log(all_value);
         this.setData({
           value,
-          all_value,
-          itemCount: all_value.categories.length,
-          count: all_value.categories.length
+          all_value
         });
-        _self.showCandle("canvasCandle", all_value);
-        _self.showColumn("canvasColumn", all_value);
+        // 隐藏加载框
+        wx.hideLoading();
       })
       .catch(err => {
         //请求失败
@@ -362,240 +676,13 @@ Page({
       });
     setTimeout(function() {
       wx.hideLoading()
-    }, 5000)
-  },
-
-  /**
-   * 柱形图
-   */
-  showColumn(canvasId, chartData) {
-    canvaColumn = new uCharts({
-      $this: _self,
-      canvasId: canvasId,
-      type: 'column',
-      legend: false,
-      fontSize: 11,
-      background: '#0e0e0e',
-      pixelRatio: 1,
-      animation: true,
-      enableScroll: true,
-      categories: chartData.categories,
-      series: chartData.seriesColumn,
-      xAxis: {
-        disable: true,
-        disableGrid: true,
-        itemCount: chartData.categories.length,
-        scrollShow: true,
-        scrollAlign: 'right',
-        labelCount: 4,
-      },
-      yAxis: {
-        //disabled:true
-        // gridType: 'dash',
-        disableGrid: true,
-        showTitle: true,
-        splitNumber: 3,
-        data: [{
-          title: '成交量(万手)',
-          format: (val) => {
-            var val = val / 10000;
-            if (val < 100) {
-              return val.toFixed(2);
-            }
-            return val.toFixed(0)
-          }
-        }]
-      },
-      dataLabel: false,
-      width: _self.cWidth,
-      height: _self.cHeight / 1.5,
-      extra: {
-        column: {
-          type: 'group',
-          width: _self.cWidth / chartData.categories.length
-        },
-        tooltip: {
-          activeBgColor: '#fff'
-        }
-      }
-    });
-
-  },
-  touchEndColumn(e) {
-    if (e.touches.length == 0) {
-      canvaColumn.scrollEnd(e);
-      canvaCandle.scrollEnd(e);
-      canvaColumn.showToolTip(e, {
-        format: function(item, category) {
-          if (typeof item.data === 'object') {
-            return category + ' ' + item.name + ':' + item.data.value
-          } else {
-            return category + ' ' + item.name + ':' + item.data
-          }
-        }
-      });
-    } else {
-      this.setData({
-        count: this.chartsItemCount
-      })
-    }
-  },
-
-  /**
-   *  K线图
-   */
-  showCandle(canvasId, chartData) {
-    canvaCandle = new uCharts({
-      $this: _self,
-      canvasId: canvasId,
-      type: 'candle',
-      fontSize: 11,
-      legend: true,
-      background: '#0e0e0e',
-      pixelRatio: 1,
-      categories: chartData.categories,
-      series: chartData.seriesCandle,
-      animation: true,
-      enableScroll: true,
-      xAxis: {
-        disableGrid: true,
-        itemCount: chartData.categories.length,
-        // scrollShow: true,
-        scrollAlign: 'right',
-        labelCount: 4,
-      },
-      yAxis: {
-        //disabled:true
-        gridType: 'dash',
-        splitNumber: 5,
-        format: (val) => {
-          if (val < 100) {
-            return val.toFixed(2)
-          } else if (val < 1000) {
-            return val.toFixed(1)
-          }
-          return val.toFixed(0)
-        }
-      },
-      width: _self.cWidth,
-      height: _self.cHeight,
-      dataLabel: false,
-      dataPointShape: true,
-      extra: {
-        candle: {
-          color: {
-            upLine: '#ff0000',
-            upFill: '#ff0000',
-            downLine: '#00ff00',
-            downFill: '#00ff00'
-          },
-          average: {
-            show: true,
-            name: ['MA5', 'MA10', 'MA20'],
-            day: [5, 10, 20],
-            color: ['#1890ff', '#2fc25b', '#facc14']
-          }
-        },
-        tooltip: {
-          bgColor: '#000000',
-          bgOpacity: 0.7,
-          gridType: 'dash',
-          dashLength: 5,
-          gridColor: '#1890ff',
-          fontColor: '#FFFFFF',
-          horizentalLine: true,
-          xAxisLabel: true,
-          yAxisLabel: true,
-          labelBgColor: '#DFE8FF',
-          labelBgOpacity: 0.95,
-          labelAlign: 'left',
-          labelFontColor: '#666666'
-        }
-      },
-    });
-  },
-  touchCandle(e) {
-    if (e.touches.length == 1) {
-      canvaCandle.scrollStart(e);
-      canvaColumn.scrollStart(e);
-    } else if (e.touches.length == 2) {
-      this.touchNum = Math.floor(Math.abs(e.touches[0].x - e.touches[1].x));
-    }
-    this.lastMoveTime = Date.now();
-  },
-  moveCandle(e) {
-    let currMoveTime = Date.now();
-    let duration = currMoveTime - this.lastMoveTime;
-    if (duration < Math.floor(1000 / 60)) return;
-    this.lastMoveTime = currMoveTime;
-    if (e.touches.length == 1) {
-      canvaCandle.scroll(e);
-      canvaColumn.scroll(e);
-    } else if (e.touches.length == 2) {
-      var len = Math.abs(e.touches[0].x - e.touches[1].x);
-      if (Math.abs(len - this.touchNum) < 10) return;
-      this.chartsItemCount = this.chartsItemCount + Math.floor((this.touchNum - len) / 10);
-      if (this.chartsItemCount < 5) {
-        this.chartsItemCount = 5;
-      } else if (this.chartsItemCount > this.data.itemCount) {
-        this.chartsItemCount = this.data.itemCount;
-      }
-      setTimeout(() => {
-        this.zoomCandle(this.chartsItemCount);
-      }, 200);
-      this.touchNum = len;
-    }
-  },
-  touchEndCandle(e) {
-    console.log(e)
-    if (e.touches.length == 0) {
-      canvaColumn.scrollEnd(e);
-      canvaCandle.scrollEnd(e);
-      //下面是toolTip事件，如果滚动后不需要显示，可不填写
-      canvaCandle.showToolTip(e, {
-        format: function(item, category) {
-          return category + ' ' + item.name + ':' + item.data
-        }
-      });
-    } else {
-      this.setData({
-        count: this.chartsItemCount
-      })
-    }
-  },
-  changeCount(e) {
-    var count = this.data.count;
-    if (e.currentTarget.id == 'jia'){
-      if(count == this.data.itemCount){
-        return;
-      }
-      count += 1;
-    }else{
-      if (count == 5) {
-        return;
-      }
-      count -= 1;
-    }
-    this.setData({
-      count
-    });
-    _self.zoomCandle(count);
-  },
-  zoomCandle(val) {
-    canvaCandle.zoom({
-      itemCount: val
-    });
-    canvaColumn.zoom({
-      itemCount: val
-    });
+    }, 10000)
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function() {
-
-  },
+  onReady: function() {},
 
   /**
    * 生命周期函数--监听页面显示
@@ -620,7 +707,16 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
-
+    this.dataLoad(this.data.type, this.data.code, 'day', 30);
+    this.setData({
+      select_id: 'dk'
+    });
+    setTimeout(function() {
+      // 隐藏导航栏加载框
+      wx.hideNavigationBarLoading();
+      // 停止下拉动作
+      wx.stopPullDownRefresh();
+    }, 500)
   },
 
   /**

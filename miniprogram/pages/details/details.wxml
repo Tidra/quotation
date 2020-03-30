@@ -2,7 +2,7 @@
 <view class="container">
   <!--数据部分-->
   <view class="head">
-    <view class="title">{{value.name}}
+    <view class="title" style="font-size: {{value.size}}rpx">{{value.name}}
       <text class="code">{{value.code}}</text>
     </view>
     <image class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
@@ -27,7 +27,7 @@
       </view>
       <view class="column">
         <text>成交量</text>
-        <text class="font-18 col-white">{{value.volume}}手</text>
+        <text class="font-18 col-white">{{value.volume}}</text>
       </view>
       <view class="column">
         <text>换手率</text>
@@ -48,28 +48,47 @@
         <text class="col-white">{{value.turnover}}</text>
       </view>
       <view class="row">
-        <text>内盘</text>
-        <text class="col-white">{{value.sell}}</text>
-      </view>
-      <view class="row">
-        <text>外盘</text>
-        <text class="col-white">{{value.buy}}</text>
+        <text>振幅</text>
+        <text class="col-white">{{value.amplitude}}%</text>
       </view>
       <view class="row">
         <text>总市值</text>
         <text class="col-white">{{value.totalMarketCapitaliza}}</text>
       </view>
-      <view class="row">
-        <text>市盈率</text>
-        <text class="col-white">{{value.pe}}</text>
-      </view>
-      <view class="row">
-        <text>振幅</text>
-        <text class="col-white">{{value.amplitude}}%</text>
-      </view>
-      <view class="row">
+      <view class="row" wx:if="{{value.marketCapitalization || value.marketCapitalization === 0}}">
         <text>流通市值</text>
         <text class="col-white">{{value.marketCapitalization}}</text>
+      </view>
+      <view class="row" wx:if="{{value.pe || value.pe === 0}}">
+        <text>市盈率</text>
+        <text class="col-white">{{value.pe}}%</text>
+      </view>
+      <view class="row" wx:if="{{value.pbr || value.pbr === 0}}">
+        <text>市净率</text>
+        <text class="col-white">{{value.pbr}}%</text>
+      </view>
+      <view class="row" wx:if="{{value.qrr || value.qrr === 0}}">
+        <text>量比</text>
+        <text class="col-white">{{value.qrr}}</text>
+      </view>
+      <view class="row-button" wx:if="{{type != 'gupiao_data' && !more_data}}" bindtap="moreData">
+        <text>更多</text>
+      </view>
+      <view class="row-button" wx:if="{{type != 'gupiao_data' && more_data}}" bindtap="moreData">
+        <text>收起</text>
+      </view>
+      <view class="row-line" wx:if="{{type != 'gupiao_data' && more_data}}"></view>
+      <view class="row-oneline" wx:if="{{value.ttm && more_data}}">
+        <text>上市时间</text>
+        <text class="col-white">{{value.ttm}}</text>
+      </view>
+      <view class="row-two" wx:if="{{(value.eps || value.eps === 0) && more_data}}">
+        <text>每股收益</text>
+        <text class="col-white">{{value.eps}}</text>
+      </view>
+      <view class="row-two" wx:if="{{(value.navps || value.navps === 0) && more_data}}">
+        <text>每股净资产</text>
+        <text class="col-white">{{value.navps}}</text>
       </view>
     </view>
   </view>
@@ -84,14 +103,8 @@
       <text id="mh" class="{{select_id=='mh'?'pic-sel':'pic-nosel'}}" bindtap="select">自选</text>
     </view>
     <!--折线图-->
-    <view class="qiun-charts">
-      <canvas canvas-id="canvasCandle" id="canvasCandle" class="chartsCandle" disable-scroll="true" bindtouchstart="touchCandle" bindtouchmove="moveCandle" bindtouchend="touchEndCandle"></canvas>
-      <canvas canvas-id="canvasColumn" id="canvasColumn" class="chartsColumn" bindtouchstart="touchCandle" bindtouchmove="moveCandle" bindtouchend="touchEndColumn"></canvas>
-      <cover-view class="all-zoom">
-        <cover-image id="jian" class="{{count<=5?'no-zoom':'zoom'}}" src="../../icon/jian.png" bindtap="{{count<=5?'':'changeCount'}}"></cover-image>
-        <cover-image id="jia" class="{{count>=itemCount?'no-zoom':'zoom'}}" src="../../icon/jia.png" bindtap="{{count>=itemCount?'':'changeCount'}}"></cover-image>
-        <!-- <slider value="{{itemCount}}" min="5" max="{{itemCount}}" block-color="#f8f8f8" block-size="18" bindchanging="sliderMove" bindchange="sliderMove" /> -->
-      </cover-view>
+    <view class="chart">
+      <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
     </view>
   </view>
 

@@ -7,7 +7,7 @@ const PUT = 'PUT';
 const FORM = 'FORM';
 const DELETE = 'DELETE';
 
-const baseURL = 'http://134.175.192.53:8080/gupiao_data/';
+const baseURL = 'http://134.175.192.53:8080/';
 
 function request(method, url, data) {
   return new Promise(function(resolve, reject) {
@@ -41,22 +41,25 @@ function request(method, url, data) {
 }
 
 const getData = {
-  selectByCode: function(code, date_unit, num) {
-    var url_data = 'findDataByCodeOrName/';
+  // 单支股票全部数据
+  selectByCode: function(type, code, date_unit, num) {
+    var url_data = type + '/findDataByCodeOrName/';
     url_data += code + '/1/';
     url_data += num;
     return request(GET, url_data)
   },
-  selectAll: function(order, start) {
-    var url_data = 'findDataByRegex/%20/';
+  // 单类型全部数据
+  selectAll: function(type, order, start) {
+    var url_data = type + '/findDataByRegex/+/';
     if (order == undefined) {
       order = 'comprehensive';
     }
-    url_data += order + '/' + start.toString() + '/10';
+    url_data += order + '/' + start.toString() + '/11';
     return request(GET, url_data)
   },
-  selectFuzzy: function(data, order, start) {
-    var url_data = 'findDataByRegex/';
+  // 模糊查询
+  selectFuzzy: function(type, data, order, start) {
+    var url_data = type + '/findDataByRegex/';
     url_data += data.replace(/\s/, "%20") + '/';
     if (order == undefined) {
       order = 'comprehensive';

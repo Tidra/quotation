@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/details/details",
     "pages/seach/seach",
-    "pages/user/user"
+    "pages/user/user",
+    "pages/fund/fund"
   ],
   "window": {
     "backgroundColor": "#0e0e0e",

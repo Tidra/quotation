@@ -48,7 +48,7 @@ Page({
       sort_by,
       sort_icon
     });
-    this.dataLoad(this.data.seach_value, sort_by, 1)
+    this.dataLoad('gupiao_data', this.data.seach_value, sort_by, 1)
   },
 
   // 显示搜索框
@@ -75,12 +75,12 @@ Page({
       sort_icon: ['up-down', 'up-down', 'up-down']
     });
     this.seachIs();
-    this.dataLoad(seach_value, 'comprehensive', 1)
+    this.dataLoad('gupiao_data', seach_value, 'comprehensive', 1)
   },
 
   //数据获取
-  dataLoad: function(data, order, start) {
-    db.getData.selectFuzzy(data, order, start).then(res => {
+  dataLoad: function(type, data, order, start) {
+    db.getData.selectFuzzy(type, data, order, start).then(res => {
         //请求成功
         console.log(res, typeof(res.data))
         var value = this.data.value;
@@ -112,7 +112,7 @@ Page({
     this.setData({
       seach_value: options.seach_value,
     })
-    this.dataLoad(options.seach_value, 'comprehensive', 1)
+    this.dataLoad('gupiao_data', options.seach_value, 'comprehensive', 1)
   },
 
   /**

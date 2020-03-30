@@ -56,15 +56,15 @@ Page({
         quoteChange: -4.48,
         change: -340.69
       }],
-      concepts: [],
-      hongkong: [],
+      uss: [],
+      fund: [],
       globle: [],
       others: []
     },
     value: {
       hushen: [],
-      concepts: [],
-      hongkong: [],
+      uss: [],
+      fund: [],
       globle: [],
       others: []
     }
@@ -80,9 +80,15 @@ Page({
         });
       }, 50);
     } else {
-      wx.navigateTo({
-        url: '/pages/details/details?code=' + e.currentTarget.id,
-      })
+      if (this.data.select_id == 'fund') {
+        wx.navigateTo({
+          url: '/pages/fund/fund?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
+        })
+      } else {
+        wx.navigateTo({
+          url: '/pages/details/details?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
+        })
+      }
     }
   },
 
@@ -97,39 +103,28 @@ Page({
   // 排序
   sort: function(e) {
     console.log(e.currentTarget.id);
+    var id = e.currentTarget.id;
+    var arr = ['closingPrice', 'quoteChange', 'change'];
+    if (this.data.select_id == 'fund')
+      arr = ['unitNetWorth', 'cumulativeNetWorth', 'growthRate'];
+    var i = arr.indexOf(id);
     var sort_by = this.data.sort_by;
     var sort_icon = ['up-down', 'up-down', 'up-down'];
-    if (e.currentTarget.id == "sort1") {
-      if (sort_by == 'comprehensive') {
+    if (id == "comprehensive") {
+      if (sort_by == id) {
         return;
       }
-      sort_by = 'comprehensive';
-    } else if (e.currentTarget.id == "sort2") {
-      if (sort_by == 'closingPriceDrop') {
-        console.log(sort_by)
-        sort_by = 'closingPriceRise';
-        sort_icon[0] = 'up';
-      } else {
-        sort_by = 'closingPriceDrop';
-        sort_icon[0] = 'down';
-      }
-    } else if (e.currentTarget.id == "sort3") {
-      if (sort_by == 'quoteChangeDrop') {
-        sort_by = 'quoteChangeRise';
-        sort_icon[1] = 'up';
-      } else {
-        sort_by = 'quoteChangeDrop';
-        sort_icon[1] = 'down';
-      }
+      sort_by = id;
     } else {
-      if (sort_by == 'changeDrop') {
-        sort_by = 'changeRise';
-        sort_icon[2] = 'up';
+      if (sort_by == id + 'Drop') {
+        console.log(sort_by)
+        sort_by = id + 'Rise';
+        sort_icon[i] = 'up';
       } else {
-        sort_by = 'changeDrop';
-        sort_icon[2] = 'down';
+        sort_by = id + 'Drop';
+        sort_icon[i] = 'down';
       }
-    }
+    };
     this.setData({
       sort_by,
       sort_icon,
@@ -215,20 +210,40 @@ Page({
     wx.showLoading({
       title: '玩命加载中',
     })
-    db.getData.selectAll(order, page).then(res => {
+    var ttype = 'other';
+    if (type == 'hushen')
+      ttype = 'gupiao_data';
+    else if (type == 'uss')
+      ttype = 'USA_stock_data';
+    else if (type == 'fund')
+      ttype = 'jijin_data';
+    db.getData.selectAll(ttype, order, page).then(res => {
         //请求成功
         console.log(res, typeof(res.data))
         var value = this.data.value;
-        var newValue = res.data.map(function(e) {
-          return {
-            code: e.code,
-            name: e.name,
-            current: e.closingPrice,
-            previousClose: e.previousClose,
-            quoteChange: e.quoteChange,
-            change: e.change
-          }
-        });
+        var newValue;
+        if (type == 'fund') {
+          newValue = res.data.map(function(e) {
+            return {
+              code: e.code,
+              name: e.fundName,
+              unitNetWorth: e.unitNetWorth,
+              cumulativeNetWorth: e.cumulativeNetWorth,
+              growthRate: e.growthRate
+            }
+          });
+        } else {
+          newValue = res.data.map(function(e) {
+            return {
+              code: e.code,
+              name: e.name,
+              current: e.closingPrice,
+              previousClose: e.previousClose,
+              quoteChange: e.quoteChange,
+              change: e.change
+            }
+          });
+        }
 
         if (page == 1) {
           value[type] = newValue;
@@ -347,43 +362,13 @@ Page({
     // 显示顶部刷新图标
     wx.showNavigationBarLoading();
 
-    var type = this.data.select_id;
-    var order = this.data.sort_by;
-    var page = 1;
-    db.getData.selectAll(order, page).then(res => {
-        //请求成功
-        console.log(res, typeof(res.data))
-        var value = this.data.value;
-        value[type] = res.data.map(function(e) {
-          return {
-            code: e.code,
-            name: e.name,
-            current: e.closingPrice,
-            previousClose: e.previousClose,
-            quoteChange: e.quoteChange,
-            change: e.change
-          }
-        });
-
-        // 隐藏导航栏加载框
-        wx.hideNavigationBarLoading();
-        // 停止下拉动作
-        wx.stopPullDownRefresh();
-
-        this.setData({
-          value,
-          page
-        });
-      })
-      .catch(err => {
-        //请求失败
-      });
+    this.dataLoad(this.data.select_id, this.data.sort_by, 1);
     setTimeout(function() {
       // 隐藏导航栏加载框
       wx.hideNavigationBarLoading();
       // 停止下拉动作
       wx.stopPullDownRefresh();
-    }, 5000)
+    }, 500)
   },
 
   /**
