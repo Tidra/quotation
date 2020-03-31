@@ -10,7 +10,7 @@ var upColor = '#ec0000';
 var upBorderColor = '#8A0000';
 var downColor = '#00da3c';
 var downBorderColor = '#008F28';
-var guData = {
+var globalData = {
   "categoryData": [],
   "values": [],
   "volumes": []
@@ -291,7 +291,7 @@ function initChart(canvas, width, height, dpr) {
   });
   canvas.setChart(chart);
 
-  setOption(chart, guData, '日')
+  setOption(chart, globalData, '日')
 
   return chart;
 }
@@ -321,7 +321,6 @@ Page({
     ec: {
       onInit: initChart
     },
-    itime: 1500,
     is_hide: 'none',
     select_id: 'dk',
     more_data: false,
@@ -359,12 +358,9 @@ Page({
       type = 'gupiao_data';
     else if (options.type == 'uss')
       type = 'USA_stock_data';
-    else if (options.type == 'fund')
-      type = 'jijin_data';
 
     this.dataLoad(type, options.code, 'day', 30);
 
-    // 具体数据、屏幕宽度
     this.setData({
       code: options.code,
       type
@@ -604,9 +600,9 @@ Page({
       })(newData)
     };
 
-    guData = all_value;
+    globalData = all_value;
     try {
-      setOption(chart, guData, name);
+      setOption(chart, globalData, name);
     } catch (e) {
       console.log(e)
     }
@@ -652,8 +648,8 @@ Page({
           qrr: res.data[0].qrr,
           pbr: res.data[0].pbr,
           ttm: res.data[0].ttm > 0 ? res.data[0].ttm.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3') : null,
-          eps: res.data[0].eps ? res.data[0].eps.toFixed(2) : '',
-          navps: res.data[0].navps ? res.data[0].navps.toFixed(2) : '',
+          eps: res.data[0].eps ? res.data[0].eps.toFixed(3) : '',
+          navps: res.data[0].navps ? res.data[0].navps.toFixed(3) : '',
           amplitude: res.data[0].amplitude || ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
           marketCapitalization: changeUnit(res.data[0].marketCapitalization)
         };

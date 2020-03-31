@@ -28,7 +28,7 @@
       </view>
     </view>
     <scroll-view scroll-y="true" style="height: {{winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
-      <navigator url="/pages/details/details?code={{item.code}}" wx:for="{{value[select_id]}}" data-item="item">
+      <navigator url="/pages/details/details?code={{item.code}}&type=hushen" wx:for="{{value[select_id]}}" data-item="item">
         <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
           <view class="item width-40">
             <text class="name">{{item.name}}</text>

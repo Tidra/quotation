@@ -227,9 +227,9 @@ Page({
             return {
               code: e.code,
               name: e.fundName,
-              unitNetWorth: e.unitNetWorth,
-              cumulativeNetWorth: e.cumulativeNetWorth,
-              growthRate: e.growthRate
+              unitNetWorth: e.unitNetWorth.toFixed(3),
+              cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
+              growthRate: e.growthRate.toFixed(2)
             }
           });
         } else {
@@ -261,6 +261,11 @@ Page({
       })
       .catch(err => {
         //请求失败
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none',
+          duration: 2000 //持续的时间
+        })
       });
     setTimeout(function() {
       wx.hideLoading()

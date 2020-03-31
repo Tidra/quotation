@@ -1,1 +1,34 @@
 /* miniprogram/pages/fund/fund.wxss */
+@import '../details/details';
+
+.data .half-left {
+  width: 55%;
+  margin: 8px 0;
+}
+
+.data .half-right {
+  width: 40%;
+  margin: 8px 0;
+}
+
+.data .value {
+  font-size: 37px;
+}
+
+.data .one-line {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.data .one-line view {
+  margin-right: 20px;
+}
+
+.pic-opt .pic-sel,.pic-opt .pic-nosel {
+  width: 33.3%;
+}
+
+ec-canvas {
+  width: 100%;
+  height: 200px;
+}

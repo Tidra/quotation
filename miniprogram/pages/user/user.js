@@ -165,9 +165,10 @@ Page({
         jijin: []
       }
     })
+    var type = 'gupiao_data';
     var queryResult = this.data.queryResult;
     for (var i in queryResult) {
-      db.getData.selectByCode(queryResult[i].code, 'day', '1').then(res => {
+      db.getData.selectByCode(type, queryResult[i].code, 'day', '1').then(res => {
           //请求成功
           var data = {
             code: res.data[0].code,

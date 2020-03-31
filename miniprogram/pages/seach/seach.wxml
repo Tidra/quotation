@@ -21,7 +21,7 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <navigator url="/pages/details/details?code={{item.code}}&type='hushen'" wx:for="{{value}}" data-item="item">
+    <navigator url="/pages/details/details?code={{item.code}}&type=hushen" wx:for="{{value}}" data-item="item">
       <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
         <view class="item width-40">
           <text class="name">{{item.name}}</text>

@@ -1,2 +1,49 @@
 <!--miniprogram/pages/fund/fund.wxml-->
-<text>等待开发</text>
+<view class="container">
+  <!--数据部分-->
+  <view class="head">
+    <view class="title" style="font-size: {{value.size}}rpx">{{value.name}}
+      <text class="code">{{value.code}}</text>
+    </view>
+    <image class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
+    <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
+  </view>
+  <view class="data">
+    <view class="half-left">
+      <view>最新净值({{value.date}})</view>
+      <view class="value {{value.growthRate>=0?'col-red':'col-green'}}">{{value.cumulativeNetWorth}}</view>
+    </view>
+    <view class="half-right">
+      <view>日涨幅</view>
+      <view class="{{value.growthRate>=0?'col-red':'col-green'}}"><text class="value">{{value.growthRate}}</text>%</view>
+    </view>
+    <view class="one-line">
+      <view>单位净值</view>
+      <view class="{{value.growthRate>=0?'col-red':'col-green'}}">{{value.unitNetWorth}}</view>
+    </view>
+  </view>
+
+  <!--图例部分-->
+  <view class="pic">
+    <view class="pic-opt">
+      <text id="growthRate" class="{{select_id=='growthRate'?'pic-sel':'pic-nosel'}}" bindtap="select">增长率</text>
+      <text id="unitNetWorth" class="{{select_id=='unitNetWorth'?'pic-sel':'pic-nosel'}}" bindtap="select">单位净值</text>
+      <text id="cumulativeNetWorth" class="{{select_id=='cumulativeNetWorth'?'pic-sel':'pic-nosel'}}" bindtap="select">累计净值</text>
+    </view>
+    <!--折线图-->
+    <view class="chart">
+      <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
+    </view>
+  </view>
+
+  <!-- 搜索遮罩 -->
+  <view class="shade" style="display:{{is_hide}};" bindtap="seachIs"></view>
+  <form bindsubmit="seach" style="display:{{is_hide}}; width:90%;">
+    <view class="in-seach">
+      <image class="seach" src='/icon/seach.png' mode="aspectFit"></image>
+      <input name="seach_value" focus="true" confirm-type="search" placeholder="股票名称/代码" bindconfirm="seach"></input>
+      <button form-type="submit">搜索</button>
+    </view>
+  </form>
+
+</view>
