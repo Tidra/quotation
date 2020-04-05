@@ -52,6 +52,7 @@ function setOption(chart, data, name) {
     series: [{
       type: 'line',
       name: name,
+      symbol: 'none',
       data: data.values,
       areaStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
@@ -59,7 +60,7 @@ function setOption(chart, data, name) {
           color: 'rgba(128, 128, 128, 0.5)'
         }, {
           offset: 1,
-            color: 'rgba(128, 128, 128, 0)'
+          color: 'rgba(128, 128, 128, 0)'
         }])
       },
     }]
@@ -95,6 +96,7 @@ Page({
     ec: {
       onInit: initChart
     },
+    addOrDelete: true,
     is_hide: 'none',
     select_id: 'growthRate',
     value: '',
@@ -104,11 +106,73 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    this.dataLoad('jijin_data', options.code, 'day', 30);
+    this.dataLoad('jijin_data', options.code, 'day', 100);
+    if (app.globalData.openid) {
+      this.onQuery(options.code, 'jijin_data');
+    }
 
     this.setData({
       code: options.code
     });
+  },
+
+  // 查询是否存在
+  onQuery: function (code, type) {
+    const db = wx.cloud.database()
+    // 查询当前用户的 counters
+    db.collection('joinquant').where({
+      _openid: app.globalData.openid,
+      code: code,
+      type: type
+    }).get({
+      success: res => {
+        console.log('[数据库] [查询记录] 成功: ', res)
+        if (res.data.length != 0) {
+          this.setData({
+            addOrDelete: false,
+            _id: res.data[0]._id
+          })
+        }
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '查询记录失败'
+        })
+        console.error('[数据库] [查询记录] 失败：', err)
+      }
+    })
+  },
+
+  // 删除自选
+  deleteMy: function () {
+    var that = this;
+    wx.showModal({
+      title: '',
+      content: '是否删除该自选股票',
+      success(res) {
+        if (res.confirm) {
+          const db = wx.cloud.database()
+          db.collection('joinquant').doc(that.data._id).remove({
+            success: res => {
+              that.setData({
+                addOrDelete: true
+              })
+              wx.showToast({
+                title: '删除成功',
+              })
+            },
+            fail: err => {
+              wx.showToast({
+                icon: 'none',
+                title: '删除失败',
+              })
+              console.error('[数据库] [删除记录] 失败：', err)
+            }
+          })
+        } else if (res.cancel) { }
+      }
+    })
   },
 
   //加入自选
@@ -137,7 +201,7 @@ Page({
     var that = this;
     db.collection('joinquant').add({
       data: {
-        type: 'fund',
+        type: 'jijin_data',
         code: that.data.code,
         name: that.data.value.name,
         date: that.data.value.date
@@ -145,6 +209,8 @@ Page({
       success: res => {
         // 在返回结果中会包含新创建的记录的 _id
         this.setData({
+          _id: res._id,
+          addOrDelete: false,
           counterId: res._id,
         })
         wx.showToast({
@@ -204,7 +270,7 @@ Page({
     wx.showLoading({
       title: '玩命加载中',
     })
-    db.getData.selectByCode(type, code, date_unit, num).then(res => {
+    db.getData.selectByCode(type, code, date_unit, 1, num).then(res => {
         //请求成功
         var size = 75;
         var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
@@ -220,7 +286,7 @@ Page({
           date: res.data[0].date,
           unitNetWorth: res.data[0].unitNetWorth,
           cumulativeNetWorth: res.data[0].cumulativeNetWorth,
-          growthRate: res.data[0].growthRate
+          growthRate: res.data[0].growthRate.toFixed(4)
         }
 
         var all_value = {
@@ -231,10 +297,10 @@ Page({
         };
         len = res.data.length;
         for (var i in res.data) {
-          all_value.date.push(res.data[i].date);
-          all_value.unitNetWorth.push(res.data[i].unitNetWorth);
-          all_value.cumulativeNetWorth.push(res.data[i].cumulativeNetWorth);
-          all_value.growthRate.push(res.data[i].growthRate);
+          all_value.date.push(res.data[len - i - 1].date);
+          all_value.unitNetWorth.push(res.data[len - i - 1].unitNetWorth);
+          all_value.cumulativeNetWorth.push(res.data[len - i - 1].cumulativeNetWorth);
+          all_value.growthRate.push(res.data[len - i - 1].growthRate.toFixed(4));
         }
         console.log(all_value);
         globalData = {
@@ -274,12 +340,14 @@ Page({
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function () {
-    this.dataLoad('jijin_data', this.data.code, 'day', 30);
+  onPullDownRefresh: function() {
+    this.dataLoad('jijin_data', this.data.code, 'day', 100);
+    this.onQuery(this.data.code, 'jijin_data');
+
     this.setData({
       select_id: 'growthRate'
     });
-    setTimeout(function () {
+    setTimeout(function() {
       // 隐藏导航栏加载框
       wx.hideNavigationBarLoading();
       // 停止下拉动作

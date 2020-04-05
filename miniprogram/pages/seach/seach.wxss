@@ -29,57 +29,29 @@
   margin-right: 5%;
 }
 
-/* 总览栏 */
-
-.preview {
-  width: 100%;
-}
-
-.pre-opt {
-  background: #0c090a;
-  padding: 7px 0;
-  /*border: 1px solid grey;*/
-}
-
-.preview .pre-items {
-  margin: 5px 0;
-}
-
-.pre-opt, .pre-items {
-  width: 100%;
+/* 选项 */
+.pic-opt {
+  width: 90%;
   display: flex;
-  justify-content: space-between;
-  white-space: nowrap;
+  margin: 8px auto;
+  border: 1px solid grey;
+  border-radius: 5px;
 }
 
-.pre-opt .opt-no {
-  width: 20%;
+.pic-opt text:not(:first-child) {
+  border-left: 1px solid grey;
+}
+
+.pic-opt .pic-sel {
+  width: 25%;
   text-align: center;
+  color: #fff;
+  background: rgba(165, 165, 165, 0.863);
 }
 
-.pre-opt .opt-yes {
-  width: 20%;
-  color: blue;
+.pic-opt .pic-nosel {
+  width: 25%;
   text-align: center;
-  position: relative;
-}
-
-.pre-opt .opt-yes::before {
-  content: "";
-  position: absolute;
-  display: block;
-  bottom: -6px;
-  height: 9rpx;
-  background: blue;
-  right: 35%;
-  left: 35%;
-  border-radius: 69rpx;
-}
-
-.pre-item {
-  text-align: center;
-  width: 33%;
-  display: inline-block;
 }
 
 .col-red {
@@ -92,23 +64,6 @@
 
 .col-blue {
   color: #04f;
-}
-
-.pre-item .pre-name {
-  font-size: 14px;
-  color: white;
-}
-
-.pre-item .pre-sum {
-  font-size: 20px;
-}
-
-.pre-item .pre-num {
-  font-size: 12px;
-  display: flex;
-  width: 80%;
-  margin: auto;
-  justify-content: space-between;
 }
 
 /* 板块信息 */
@@ -159,6 +114,9 @@
 .inf-item .name {
   font-size: 18px;
   color: white;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .inf-item .code {

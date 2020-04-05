@@ -7,48 +7,74 @@ Page({
    */
   data: {
     is_hide: 'none',
+    select_id: 'gupiao_data',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
+  },
+
+  // 类型
+  selectId: function(e) {
+    this.setData({
+      select_id: e.currentTarget.id,
+      sort_by: 'comprehensive',
+      sort_icon: ['up-down', 'up-down', 'up-down']
+    });
+    this.dataLoad(e.currentTarget.id, this.data.seach_value, 'comprehensive', 1);
   },
 
   // 排序
   sort: function(e) {
     console.log(e.currentTarget.id);
+    var id = e.currentTarget.id;
+    var arr = ['closingPrice', 'quoteChange', 'change'];
+    if (this.data.select_id == 'jijin_data')
+      arr = ['unitNetWorth', 'cumulativeNetWorth', 'growthRate'];
+    var i = arr.indexOf(id);
     var sort_by = this.data.sort_by;
     var sort_icon = ['up-down', 'up-down', 'up-down'];
-    if (e.currentTarget.id == "sort1") {
-      sort_by = 'comprehensive';
-    } else if (e.currentTarget.id == "sort2") {
-      if (sort_by == 'closingPriceDrop') {
-        console.log(sort_by)
-        sort_by = 'closingPriceRise';
-        sort_icon[0] = 'up';
-      } else {
-        sort_by = 'closingPriceDrop';
-        sort_icon[0] = 'down';
+    if (id == "comprehensive") {
+      if (sort_by == id) {
+        return;
       }
-    } else if (e.currentTarget.id == "sort3") {
-      if (sort_by == 'quoteChangeDrop') {
-        sort_by = 'quoteChangeRise';
-        sort_icon[1] = 'up';
-      } else {
-        sort_by = 'quoteChangeDrop';
-        sort_icon[1] = 'down';
-      }
+      sort_by = id;
     } else {
-      if (sort_by == 'changeDrop') {
-        sort_by = 'changeRise';
-        sort_icon[2] = 'up';
+      if (sort_by == id + 'Drop') {
+        console.log(sort_by)
+        sort_by = id + 'Rise';
+        sort_icon[i] = 'up';
       } else {
-        sort_by = 'changeDrop';
-        sort_icon[2] = 'down';
+        sort_by = id + 'Drop';
+        sort_icon[i] = 'down';
       }
-    }
+    };
     this.setData({
       sort_by,
-      sort_icon
+      sort_icon,
+      page: 1,
     });
-    this.dataLoad('gupiao_data', this.data.seach_value, sort_by, 1)
+    this.dataLoad(this.data.select_id, this.data.seach_value, sort_by, 1)
+  },
+
+  //去详细页
+  toDetail: function(e) {
+    if (this.data.lock) {
+      //开锁
+      setTimeout(() => {
+        this.setData({
+          lock: false
+        });
+      }, 50);
+    } else {
+      if (this.data.select_id == 'jijin_data') {
+        wx.navigateTo({
+          url: '/pages/fund/fund?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
+        })
+      } else {
+        wx.navigateTo({
+          url: '/pages/details/details?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
+        })
+      }
+    }
   },
 
   // 显示搜索框
@@ -62,45 +88,112 @@ Page({
     })
   },
 
-  seach: function (e) {
+  seach: function(e) {
     var seach_value = "";
-    if (typeof (e.detail.value) == 'string') {
+    if (typeof(e.detail.value) == 'string') {
       seach_value = e.detail.value;
     } else {
       seach_value = e.detail.value.seach_value;
     }
     this.setData({
+      page: 1,
       seach_value,
       sort_by: 'comprehensive',
       sort_icon: ['up-down', 'up-down', 'up-down']
     });
     this.seachIs();
-    this.dataLoad('gupiao_data', seach_value, 'comprehensive', 1)
+    this.dataLoad(this.data.select_id, seach_value, 'comprehensive', 1)
+  },
+
+  //触底添加数据
+  bottomReLoad: function() {
+    this.dataLoad(this.data.select_id, this.data.seach_value, this.data.sort_by, this.data.page + 1);
   },
 
   //数据获取
   dataLoad: function(type, data, order, start) {
-    db.getData.selectFuzzy(type, data, order, start).then(res => {
+    var newData = data;
+    if (type == 'shangzheng_shenzheng_data') {
+      newData = '上证+' + data;
+    }
+    db.getData.selectFuzzy(type, newData, order, start).then(res => {
         //请求成功
         console.log(res, typeof(res.data))
         var value = this.data.value;
-        value = res.data.map(function(e) {
-          return {
-            code: e.code,
-            name: e.name,
-            current: e.closingPrice,
-            previousClose: e.previousClose,
-            quoteChange: e.quoteChange,
-            change: e.change
+        var newValue = res.data.map(function(e) {
+          if (type != 'jijin_data') {
+            return {
+              code: e.code,
+              name: e.name,
+              current: e.closingPrice,
+              previousClose: e.previousClose,
+              quoteChange: e.quoteChange,
+              change: e.change
+            }
+          } else {
+            return {
+              code: e.code,
+              name: e.fundName,
+              unitNetWorth: e.unitNetWorth.toFixed(3),
+              cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
+              growthRate: e.growthRate.toFixed(2)
+            }
           }
         });
-        console.log(value)
-        this.setData({
-          value
-        })
+        if (type == 'shangzheng_shenzheng_data') {
+          newData = '深证+' + data;
+          db.getData.selectFuzzy(type, newData, order, start).then(res => {
+            newValue = newValue.concat(res.data.map(function(e) {
+              return {
+                code: e.code,
+                name: e.name,
+                current: e.closingPrice,
+                previousClose: e.previousClose,
+                quoteChange: e.quoteChange,
+                change: e.change
+              }
+            }));
+
+
+            if (start == 1) {
+              value = newValue;
+            } else {
+              value = value.concat(newValue);
+            }
+
+            console.log(value);
+            this.setData({
+              page: start,
+              value
+            });
+          }).catch(err => {
+            //请求失败
+            wx.showToast({
+              title: '网络错误',
+              icon: 'none',
+              duration: 2000 //持续的时间
+            })
+          });
+        } else {
+          if (start == 1) {
+            value = newValue;
+          } else {
+            value = value.concat(newValue);
+          }
+          console.log(value);
+          this.setData({
+            page: start,
+            value
+          });
+        }
       })
       .catch(err => {
         //请求失败
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none',
+          duration: 2000 //持续的时间
+        })
       });
   },
 
@@ -110,7 +203,9 @@ Page({
   onLoad: function(options) {
     console.log(options);
     this.setData({
+      page: 1,
       seach_value: options.seach_value,
+      winHeight: wx.getSystemInfoSync().windowHeight - 115
     })
     this.dataLoad('gupiao_data', options.seach_value, 'comprehensive', 1)
   },

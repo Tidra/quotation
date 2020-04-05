@@ -2,17 +2,17 @@
 @import '../details/details';
 
 .data .half-left {
-  width: 55%;
+  width: 50%;
   margin: 8px 0;
 }
 
 .data .half-right {
-  width: 40%;
+  width: 45%;
   margin: 8px 0;
 }
 
 .data .value {
-  font-size: 37px;
+  font-size: 70rpx;
 }
 
 .data .one-line {
@@ -31,4 +31,39 @@
 ec-canvas {
   width: 100%;
   height: 200px;
+}
+
+/* 历史记录 */
+.inf {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.inf-opt {
+  width: 95%;
+  display: flex;
+  padding: 10rpx 2.5%;
+  background: #0e0e0e;
+}
+
+.width-40 {
+  text-align: left;
+  width: 31%;
+}
+
+.width-20 {
+  width: 23%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inf-item {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  width: 95%;
+  margin: auto;
+  padding: 20rpx 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.212);
 }

@@ -15,6 +15,7 @@ Page({
     is_seach: false,
     is_sidebar: false,
     select_id: 'hushen',
+    select_index: '上证',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
     page: 1,
@@ -30,42 +31,37 @@ Page({
       hushen: [{
         code: '000001',
         name: '上证指数',
-        current: 2880.30,
-        previousClose: 2991.33,
-        quoteChange: -3.71,
-        change: -111.03
+        current: '-',
+        previousClose: '-',
+        quoteChange: '-',
+        change: '-'
       }, {
         code: '000906',
         name: '中证800',
-        current: 4189.31,
-        previousClose: 4363.01,
-        quoteChange: -3.98,
-        change: -173.70
+        current: '-',
+        quoteChange: '-',
+        change: '-'
       }, {
         code: '399004',
         name: '深证100R',
-        current: 6149.33,
-        previousClose: 6412.27,
-        quoteChange: -4.10,
-        change: -262.95
+        current: '-',
+        quoteChange: '-',
+        change: '-'
       }, {
         code: '399005',
         name: '中小板指',
-        current: 7256.44,
-        previousClose: 7597.13,
-        quoteChange: -4.48,
-        change: -340.69
+        current: '-',
+        quoteChange: '-',
+        change: '-'
       }],
       uss: [],
-      fund: [],
-      globle: [],
       others: []
     },
     value: {
       hushen: [],
       uss: [],
       fund: [],
-      globle: [],
+      index: [],
       others: []
     }
   },
@@ -130,7 +126,19 @@ Page({
       sort_icon,
       page: 1,
     });
-    this.dataLoad(this.data.select_id, sort_by, 1)
+    if (this.data.select_id == 'index') {
+      this.dataLoad(this.data.select_id, this.data.sort_by, 1, this.data.select_index);
+    } else {
+      this.dataLoad(this.data.select_id, sort_by, 1);
+    }
+  },
+
+  // 指数选择显示
+  selectIndex: function(e){
+    this.setData({
+      select_index: e.currentTarget.id
+    });
+    this.dataLoad(this.data.select_id, 'comprehensive', 1, e.currentTarget.id);
   },
 
   // 选择显示
@@ -141,7 +149,12 @@ Page({
       sort_icon: ['up-down', 'up-down', 'up-down'],
       page: 1
     })
+    if (e.currentTarget.id == 'index') {
+      this.dataLoad(e.currentTarget.id, 'comprehensive', 1, this.data.select_index);
+      return;
+    }
     this.dataLoad(e.currentTarget.id, 'comprehensive', 1)
+    this.loadIndex(e.currentTarget.id);
   },
 
   // 显示搜索框
@@ -205,11 +218,14 @@ Page({
   },
 
   //数据获取
-  dataLoad: function(type, order, page) {
+  dataLoad: function(type, order, page, other) {
     // 显示加载图标
     wx.showLoading({
       title: '玩命加载中',
     })
+    if (other == undefined)
+      other = '';
+
     var ttype = 'other';
     if (type == 'hushen')
       ttype = 'gupiao_data';
@@ -217,7 +233,10 @@ Page({
       ttype = 'USA_stock_data';
     else if (type == 'fund')
       ttype = 'jijin_data';
-    db.getData.selectAll(ttype, order, page).then(res => {
+    else if (type == 'index')
+      ttype = 'shangzheng_shenzheng_data';
+
+    db.getData.selectAll(ttype, order, page, other).then(res => {
         //请求成功
         console.log(res, typeof(res.data))
         var value = this.data.value;
@@ -272,16 +291,53 @@ Page({
     }, 5000)
   },
 
+  //指数栏加载
+  loadIndex: function(type) {
+    var value_index = this.data.value_index;
+    value_index[type] = [];
+    this.setData({
+      value_index
+    });
+
+    var code = [];
+    if (type == 'hushen') {
+      code = ['000001', '000906', '399004', '399005'];
+    }
+    for (var i in code) {
+      db.getData.selectByCode('shangzheng_shenzheng_data', code[i], 'day', 1, 1).then(res => {
+        var value = {
+          code: res.data[0].code,
+          name: res.data[0].name,
+          current: res.data[0].closingPrice,
+          change: res.data[0].change,
+          quoteChange: res.data[0].quoteChange
+        }
+        value_index = this.data.value_index;
+        value_index[type].push(value);
+        this.setData({
+          value_index
+        });
+      }).catch(err => {
+        //请求失败
+      });
+    }
+  },
+
   //触底添加数据
   bottomReLoad: function() {
-    this.dataLoad(this.data.select_id, this.data.sort_by, this.data.page + 1);
+    if (this.data.select_id == 'index') {
+      this.dataLoad(this.data.select_id, this.data.sort_by, this.data.page + 1, this.data.select_index);
+    } else {
+      this.dataLoad(this.data.select_id, this.data.sort_by, this.data.page + 1);
+    }
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    this.dataLoad('hushen', 'comprehensive', 1)
+    this.dataLoad('hushen', 'comprehensive', 1);
+    this.loadIndex('hushen');
     this.setData({
       winHeight: wx.getSystemInfoSync().windowHeight - 194
     })
@@ -366,8 +422,12 @@ Page({
   onPullDownRefresh: function() {
     // 显示顶部刷新图标
     wx.showNavigationBarLoading();
-
-    this.dataLoad(this.data.select_id, this.data.sort_by, 1);
+    if (this.data.select_id == 'index') {
+      this.dataLoad(this.data.select_id, this.data.sort_by, 1, this.data.select_index);
+    } else {
+      this.loadIndex(this.data.select_id);
+      this.dataLoad(this.data.select_id, this.data.sort_by, 1);
+    }
     setTimeout(function() {
       // 隐藏导航栏加载框
       wx.hideNavigationBarLoading();

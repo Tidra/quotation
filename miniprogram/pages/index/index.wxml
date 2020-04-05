@@ -14,11 +14,11 @@
       <text id="hushen" class="{{select_id=='hushen'?'opt-yes':'opt-no'}}" bindtap="select">沪深</text>
       <text id="uss" class="{{select_id=='uss'?'opt-yes':'opt-no'}}" bindtap="select">美股</text>
       <text id="fund" class="{{select_id=='fund'?'opt-yes':'opt-no'}}" bindtap="select">基金</text>
-      <text id="globle" class="{{select_id=='globle'?'opt-yes':'opt-no'}}" bindtap="select">全球</text>
+      <text id="index" class="{{select_id=='index'?'opt-yes':'opt-no'}}" bindtap="select">指数</text>
       <text id="others" class="{{select_id=='others'?'opt-yes':'opt-no'}}" bindtap="select">其他</text>
     </view>
-    <scroll-view scroll-x="true" class="pre-items">
-      <navigator url="/pages/details/details?code={{item.code}}" class="pre-item {{item.change>0?'col-red':'col-green'}}" wx:for="{{value_index[select_id]}}" data-item="item">
+    <scroll-view scroll-x="true" class="pre-items" wx:if="{{select_id!='index'}}">
+      <navigator url="/pages/details/details?code={{item.code}}&type=index" class="pre-item {{item.change>0?'col-red':'col-green'}}" wx:for="{{value_index[select_id]}}" data-item="item">
         <view class="pre-name">{{item.name}}</view>
         <view class="pre-sum">{{item.current}}</view>
         <view class="pre-num">
@@ -27,6 +27,10 @@
         </view>
       </navigator>
     </scroll-view>
+    <view class="pic-opt" wx:else>
+      <text id="上证" class="{{select_index=='上证'?'pic-sel':'pic-nosel'}}" bindtap="selectIndex">上证</text>
+      <text id="深证" class="{{select_index=='深证'?'pic-sel':'pic-nosel'}}" bindtap="selectIndex">深证</text>
+    </view>
   </view>
 
   <!--板块信息-->
@@ -43,7 +47,7 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <scroll-view scroll-y="true" style="height: {{winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+    <scroll-view scroll-y="true" style="height: {{select_id=='index'?winHeight+39:winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
       <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.change>=0?'col-red':'col-green'}}">
           <view class="item width-40">

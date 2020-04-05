@@ -29,6 +29,17 @@ function setOption(chart, data, name) {
     title: {
       text: '最近' + data.categoryData.length + name[0] + '数据'
     },
+    graphic: [{
+      type: 'text',
+      id: 'text_c',
+      bottom: 100,
+      left: '2%',
+      style: {
+        text: '成交量',
+        fill: '#fff',
+        shadowColor: '#e1e1e1'
+      }
+    }],
     tooltip: {
       trigger: 'axis',
       axisPointer: {
@@ -81,13 +92,20 @@ function setOption(chart, data, name) {
       }
     },
     grid: [{
-        left: '13%',
-        right: '5%',
+        // left: '13%',
+        top: 75,
+        // left: '5%',
+        // right: '5%',
+        left: '0',
+        right: '0',
         bottom: 150
       },
       {
-        left: '13%',
-        right: '5%',
+        // left: '13%',
+        // left: '5%',
+        // right: '5%',
+        left: '0',
+        right: '0',
         height: 80,
         bottom: 40
       }
@@ -134,18 +152,30 @@ function setOption(chart, data, name) {
         scale: true,
         splitArea: {
           show: true
-        }
+        },
+        axisLabel: {
+          inside: true,
+          formatter: '{value}\n'
+        },
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
       },
       {
-        name: '成交量',
-        nameLocation: 'center',
+        // name: '成交量',
+        // nameLocation: 'center',
         scale: true,
         gridIndex: 1,
         splitNumber: 2,
         axisLabel: {
           show: false
         },
-        // axisLine: {show: false},
+        axisLine: {
+          show: false
+        },
         axisTick: {
           show: false
         },
@@ -291,7 +321,7 @@ function initChart(canvas, width, height, dpr) {
   });
   canvas.setChart(chart);
 
-  setOption(chart, globalData, '日')
+  setOption(chart, globalData, '日K')
 
   return chart;
 }
@@ -320,6 +350,19 @@ Page({
   data: {
     ec: {
       onInit: initChart
+    },
+    addOrDelete: true,
+    dialogShow: false,
+    buttons: [{
+      text: '取消'
+    }, {
+      text: '确定'
+    }],
+    date: {
+      start: '2020-01-02',
+      end: '2020-03-01',
+      min: '2016-01-01',
+      max: '2020-04-02'
     },
     is_hide: 'none',
     select_id: 'dk',
@@ -358,8 +401,16 @@ Page({
       type = 'gupiao_data';
     else if (options.type == 'uss')
       type = 'USA_stock_data';
+    else if (options.type == 'index')
+      type = 'shangzheng_shenzheng_data';
+    else
+      type = options.type;
 
-    this.dataLoad(type, options.code, 'day', 30);
+    this.dataLoad(type, options.code, 'day', 1, 100);
+
+    if (app.globalData.openid) {
+      this.onQuery(options.code, type);
+    }
 
     this.setData({
       code: options.code,
@@ -371,6 +422,65 @@ Page({
   moreData: function() {
     this.setData({
       more_data: !this.data.more_data
+    })
+  },
+
+  // 查询是否存在
+  onQuery: function(code, type) {
+    const db = wx.cloud.database()
+    // 查询当前用户的 counters
+    db.collection('joinquant').where({
+      _openid: app.globalData.openid,
+      code: code,
+      type: type
+    }).get({
+      success: res => {
+        console.log('[数据库] [查询记录] 成功: ', res)
+        if (res.data.length != 0) {
+          this.setData({
+            addOrDelete: false,
+            _id: res.data[0]._id
+          })
+        }
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '查询记录失败'
+        })
+        console.error('[数据库] [查询记录] 失败：', err)
+      }
+    })
+  },
+
+  // 删除自选
+  deleteMy: function() {
+    var that = this;
+    wx.showModal({
+      title: '',
+      content: '是否删除该自选股票',
+      success(res) {
+        if (res.confirm) {
+          const db = wx.cloud.database()
+          db.collection('joinquant').doc(that.data._id).remove({
+            success: res => {
+              that.setData({
+                addOrDelete: true
+              })
+              wx.showToast({
+                title: '删除成功',
+              })
+            },
+            fail: err => {
+              wx.showToast({
+                icon: 'none',
+                title: '删除失败',
+              })
+              console.error('[数据库] [删除记录] 失败：', err)
+            }
+          })
+        } else if (res.cancel) {}
+      }
     })
   },
 
@@ -401,6 +511,7 @@ Page({
     var that = this;
     db.collection('joinquant').add({
       data: {
+        type: that.data.type,
         code: that.data.code,
         name: that.data.value.name,
         date: that.data.value.date
@@ -408,6 +519,8 @@ Page({
       success: res => {
         // 在返回结果中会包含新创建的记录的 _id
         this.setData({
+          _id: res._id,
+          addOrDelete: false,
           counterId: res._id,
         })
         wx.showToast({
@@ -427,25 +540,55 @@ Page({
 
   // 选择显示图表
   select: function(e) {
+    if (e.currentTarget.id == "zx") {
+      this.setData({
+        dialogShow: true
+      });
+      return;
+    }
     if (this.data.select_id == e.currentTarget.id) {
       return;
     }
+
+    if (e.currentTarget.id == "fd") {
+      this.dataLoad(this.data.type, this.data.code, 'day', 1, 5);
+    } else if (e.currentTarget.id == "dk") {
+      this.dataLoad(this.data.type, this.data.code, 'day', 1, 100);
+    } else if (e.currentTarget.id == "wk") {
+      this.dataLoad(this.data.type, this.data.code, 'week', 1, 5 * 30);
+    } else if (e.currentTarget.id == "mk") {
+      this.dataLoad(this.data.type, this.data.code, 'month', 1, 31 * 30);
+    }
+
     this.setData({
       select_id: e.currentTarget.id
     });
-    if (e.currentTarget.id == "fd") {
-      this.dataLoad(this.data.type, this.data.code, 'day', 5);
-    } else if (e.currentTarget.id == "dk") {
-      this.dataLoad(this.data.type, this.data.code, 'day', 30);
-    } else if (e.currentTarget.id == "wk") {
-      this.dataLoad(this.data.type, this.data.code, 'week', 5 * 30);
-    } else if (e.currentTarget.id == "mk") {
-      this.dataLoad(this.data.type, this.data.code, 'month', 31 * 30);
-    } else if (e.currentTarget.id == "mh") {
-      this.dataLoad(this.data.type, this.data.code, 'day', 5);
-    }
   },
 
+  // 自选显示框
+  tapDialogButton(e) {
+    if (e.detail.item.text == '确定') {
+      var page = this.data.date.start + '/' + this.data.date.end + '/' + 1;
+      this.dataLoad(this.data.type, this.data.code, 'day', page, 360 * 3);
+      this.setData({
+        select_id: 'zx'
+      });
+    }
+    this.setData({
+      dialogShow: false
+    })
+  },
+  // 日期选择
+  bindDateChange: function(e) {
+    var date = this.data.date;
+    date[e.currentTarget.id] = e.detail.value;
+    if (e.currentTarget.id == 'start' && date.start > date.end) {
+      date.end = date.start;
+    }
+    this.setData({
+      date
+    })
+  },
 
   // 显示搜索框
   seachIs: function() {
@@ -549,6 +692,7 @@ Page({
         return date[0] + "-" + date[1];
       }
     }
+
     for (var i in data) {
       var num = typeFunc(data[i].date);
       if (newData.hasOwnProperty(num)) {
@@ -612,14 +756,21 @@ Page({
 
 
   //数据获取
-  dataLoad: function(type, code, date_unit, num) {
+  dataLoad: function(type, code, date_unit, page, num) {
     // 显示加载图标
     wx.showLoading({
       title: '玩命加载中',
     })
-    db.getData.selectByCode(type, code, date_unit, num).then(res => {
+    db.getData.selectByCode(type, code, date_unit, page, num).then(res => {
         //请求成功
-        console.log(res.data[0])
+        if (res.data[0] == undefined) {
+          wx.showToast({
+            title: '没有数据',
+            icon: 'none',
+            duration: 2000 //持续的时间
+          });
+          return;
+        }
         var changeUnit = this.changeUnit;
         var size = 75;
         var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
@@ -703,7 +854,9 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
-    this.dataLoad(this.data.type, this.data.code, 'day', 30);
+    this.dataLoad(this.data.type, this.data.code, 'day', 1, 100);
+    this.onQuery(this.data.code, this.data.type);
+
     this.setData({
       select_id: 'dk'
     });

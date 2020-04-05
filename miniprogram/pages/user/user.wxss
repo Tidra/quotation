@@ -31,8 +31,9 @@
 /* 类型 */
 
 .pic-opt {
+  width: 90%;
   display: flex;
-  margin: 10px auto;
+  margin: 8px auto;
   border: 1px solid grey;
   border-radius: 5px;
 }
@@ -42,14 +43,14 @@
 }
 
 .pic-opt .pic-sel {
-  width: 60px;
+  width: 25%;
   text-align: center;
   color: #fff;
   background: rgba(165, 165, 165, 0.863);
 }
 
 .pic-opt .pic-nosel {
-  width: 60px;
+  width: 25%;
   text-align: center;
 }
 
@@ -113,6 +114,9 @@
 .inf-item .name {
   font-size: 18px;
   color: white;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .inf-item .code {

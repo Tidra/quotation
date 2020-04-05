@@ -7,31 +7,70 @@
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
 
+  <!-- 类型 -->
+  <view class="pic-opt">
+    <text id="gupiao_data" class="{{select_id=='gupiao_data'?'pic-sel':'pic-nosel'}}" bindtap="selectId">沪深</text>
+    <text id="USA_stock_data" class="{{select_id=='USA_stock_data'?'pic-sel':'pic-nosel'}}" bindtap="selectId">美股</text>
+    <text id="shangzheng_shenzheng_data" class="{{select_id=='shangzheng_shenzheng_data'?'pic-sel':'pic-nosel'}}" bindtap="selectId">指数</text>
+    <text id="jijin_data" class="{{select_id=='jijin_data'?'pic-sel':'pic-nosel'}}" bindtap="selectId">基金</text>
+  </view>
+
   <!--板块信息-->
-  <view class="inf">
+  <view class="inf" wx:if="{{select_id != 'jijin_data'}}">
     <view class="inf-opt">
-      <view id="sort1" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">股票名称</view>
-      <view id="sort2" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">最新
+      <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">股票名称</view>
+      <view id="closingPrice" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">最新
         <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
       </view>
-      <view id="sort3" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">涨幅
+      <view id="quoteChange" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">涨幅
         <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
       </view>
-      <view id="sort4" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">涨跌
+      <view id="change" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">涨跌
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <navigator url="/pages/details/details?code={{item.code}}&type=hushen" wx:for="{{value}}" data-item="item">
-      <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
-        <view class="item width-40">
-          <text class="name">{{item.name}}</text>
-          <text class="code">{{item.code}}</text>
+    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+      <view id="{{item.code}}" wx:for="{{value}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
+        <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
+          <view class="item width-40">
+            <text class="name">{{item.name}}</text>
+            <text class="code">{{item.code}}</text>
+          </view>
+          <text class="width-20">{{item.current}}</text>
+          <text class="width-20">{{item.quoteChange}}%</text>
+          <text class="width-20">{{item.change}}</text>
         </view>
-        <text class="width-20">{{item.current}}</text>
-        <text class="width-20">{{item.quoteChange}}%</text>
-        <text class="width-20">{{item.change}}</text>
       </view>
-    </navigator>
+    </scroll-view>
+  </view>
+  <!-- 基金 -->
+  <view class="inf" wx:else>
+    <view class="inf-opt">
+      <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">基金名称</view>
+      <view id="unitNetWorth" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">净值
+        <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
+      </view>
+      <view id="cumulativeNetWorth" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">累净值
+        <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
+      </view>
+      <view id="growthRate" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">增长率
+        <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
+      </view>
+    </view>
+    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+      <view id="{{item.code}}" wx:for="{{value}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
+        <view class="inf-item {{item.growthRate>=0?'col-red':'col-green'}}">
+          <view class="item width-40">
+            <text class="name">{{item.name}}</text>
+            <text class="code">{{item.code}}</text>
+          </view>
+          <text class="width-20">{{item.unitNetWorth}}</text>
+          <text class="width-20">{{item.cumulativeNetWorth}}</text>
+          <text class="width-20">{{item.growthRate}}%</text>
+        </view>
+        <!-- <view class="add_myself">加入自选</view> -->
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 搜索遮罩 -->

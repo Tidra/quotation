@@ -42,15 +42,20 @@ function request(method, url, data) {
 
 const getData = {
   // 单支股票全部数据
-  selectByCode: function(type, code, date_unit, num) {
+  selectByCode: function(type, code, date_unit, page, num) {
     var url_data = type + '/findDataByCodeOrName/';
-    url_data += code + '/1/';
+    url_data += code + '/';
+    url_data += page + '/';
     url_data += num;
+    console.log(url_data)
     return request(GET, url_data)
   },
   // 单类型全部数据
-  selectAll: function(type, order, start) {
-    var url_data = type + '/findDataByRegex/+/';
+  selectAll: function(type, order, start, other) {
+    if (other == undefined) {
+      other = '';
+    }
+    var url_data = type + '/findDataByRegex/' + other + '+/';
     if (order == undefined) {
       order = 'comprehensive';
     }
@@ -64,7 +69,7 @@ const getData = {
     if (order == undefined) {
       order = 'comprehensive';
     }
-    url_data += order + '/' + start.toString() + '/10';
+    url_data += order + '/' + start.toString() + '/12';
     console.log(url_data)
     return request(GET, url_data);
   }

@@ -5,7 +5,8 @@
     <view class="title" style="font-size: {{value.size}}rpx">{{value.name}}
       <text class="code">{{value.code}}</text>
     </view>
-    <image class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
+    <image wx:if="{{addOrDelete}}" class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
+    <image wx:else class="seach" src='/icon/delete.png' mode="aspectFit" bindtap="deleteMy"></image>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
   <view class="data">
@@ -15,7 +16,8 @@
     </view>
     <view class="half-right">
       <view>日涨幅</view>
-      <view class="{{value.growthRate>=0?'col-red':'col-green'}}"><text class="value">{{value.growthRate}}</text>%</view>
+      <view class="{{value.growthRate>=0?'col-red':'col-green'}}">
+        <text class="value">{{value.growthRate}}</text>%</view>
     </view>
     <view class="one-line">
       <view>单位净值</view>
@@ -34,6 +36,24 @@
     <view class="chart">
       <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
     </view>
+  </view>
+
+  <!-- 历史数据 -->
+  <view class="inf">
+    <view class="inf-opt">
+      <view id="comprehensive" class="width-40">日期</view>
+      <view id="unitNetWorth" class="width-20">单位净值</view>
+      <view id="cumulativeNetWorth" class="width-20">累计净值</view>
+      <view id="growthRate" class="width-20">增长率</view>
+    </view>
+    <scroll-view scroll-y="true" style="height: 300px;" enable-back-to-top="true">
+      <view wx:for="{{all_value.date}}" class="inf-item">
+        <view class="width-40">{{all_value.date[all_value.date.length-index-1]}}</view>
+        <text class="width-20">{{all_value.unitNetWorth[all_value.date.length-index-1]}}</text>
+        <text class="width-20">{{all_value.cumulativeNetWorth[all_value.date.length-index-1]}}</text>
+        <text class="width-20 {{all_value.growthRate[all_value.date.length-index-1]>=0?'col-red':'col-green'}}">{{all_value.growthRate[all_value.date.length-index-1]}}%</text>
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 搜索遮罩 -->

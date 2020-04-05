@@ -69,16 +69,16 @@
   position: absolute;
   display: block;
   bottom: -6px;
-  height: 9rpx;
+  height: 4.5px;
   background: #04f;
   right: 35%;
   left: 35%;
-  border-radius: 69rpx;
+  border-radius: 10px;
 }
 
 .pre-item {
   text-align: center;
-  width: 33%;
+  width: 119px;
   display: inline-block;
 }
 
@@ -167,6 +167,31 @@
 .inf-item .code {
   font-size: 12px;
   color: gray;
+}
+
+/* 指数选项 */
+.pic-opt {
+  width: 40%;
+  display: flex;
+  margin: 8px auto;
+  border: 1px solid grey;
+  border-radius: 5px;
+}
+
+.pic-opt text:not(:first-child) {
+  border-left: 1px solid grey;
+}
+
+.pic-opt .pic-sel {
+  width: 50%;
+  text-align: center;
+  color: #fff;
+  background: rgba(165, 165, 165, 0.863);
+}
+
+.pic-opt .pic-nosel {
+  width: 50%;
+  text-align: center;
 }
 
 /* .add_myself {
