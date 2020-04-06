@@ -112,6 +112,13 @@ Page({
 
   //数据获取
   dataLoad: function(type, data, order, start) {
+    if (start == 'max1') {
+      return;
+    }
+    wx.showLoading({
+      title: '玩命加载中',
+    })
+
     var newData = data;
     if (type == 'shangzheng_shenzheng_data') {
       newData = '上证+' + data;
@@ -154,12 +161,16 @@ Page({
               }
             }));
 
-
             if (start == 1) {
               value = newValue;
             } else {
               value = value.concat(newValue);
             }
+            if (newValue.length == 0) {
+              start = 'max'
+            }
+            // 隐藏加载框
+            wx.hideLoading();
 
             console.log(value);
             this.setData({
@@ -180,6 +191,11 @@ Page({
           } else {
             value = value.concat(newValue);
           }
+          if (newValue.length == 0) {
+            start = 'max'
+          }
+          // 隐藏加载框
+          wx.hideLoading();
           console.log(value);
           this.setData({
             page: start,
@@ -195,6 +211,9 @@ Page({
           duration: 2000 //持续的时间
         })
       });
+    setTimeout(function () {
+      wx.hideLoading()
+    }, 5000)
   },
 
   /**

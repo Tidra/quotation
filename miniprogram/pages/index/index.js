@@ -134,7 +134,7 @@ Page({
   },
 
   // 指数选择显示
-  selectIndex: function(e){
+  selectIndex: function(e) {
     this.setData({
       select_index: e.currentTarget.id
     });
@@ -219,6 +219,9 @@ Page({
 
   //数据获取
   dataLoad: function(type, order, page, other) {
+    if (page == 'max1') {
+      return;
+    }
     // 显示加载图标
     wx.showLoading({
       title: '玩命加载中',
@@ -263,11 +266,13 @@ Page({
             }
           });
         }
-
         if (page == 1) {
           value[type] = newValue;
         } else {
           value[type] = value[type].concat(newValue);
+        }
+        if (newValue.length == 0) {
+          page = 'max'
         }
 
         // 隐藏加载框

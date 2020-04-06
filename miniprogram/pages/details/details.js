@@ -1,5 +1,6 @@
 // miniprogram/pages/details/details.js
 var db = require("../../unit/db.js");
+var time = require("../../unit/date.js");
 import * as echarts from '../../ec-canvas/echarts';
 import '../../ec-canvas/darkin';
 const app = getApp();
@@ -43,7 +44,7 @@ function setOption(chart, data, name) {
     tooltip: {
       trigger: 'axis',
       axisPointer: {
-        animation: false,
+        animation: true,
         type: 'cross'
       }
     },
@@ -145,7 +146,10 @@ function setOption(chart, data, name) {
         },
         splitNumber: 20,
         min: 'dataMin',
-        max: 'dataMax'
+        max: 'dataMax',
+        axisPointer: {
+          type: 'shadow',
+        }
       }
     ],
     yAxis: [{
@@ -412,9 +416,17 @@ Page({
       this.onQuery(options.code, type);
     }
 
+    var date = {
+      start: time.getMonths(1),
+      end: time.getMonths(0),
+      min: time.getYears(3),
+      max: time.getYears(0)
+    }
+
     this.setData({
       code: options.code,
-      type
+      type,
+      date
     });
   },
 
@@ -569,7 +581,7 @@ Page({
   tapDialogButton(e) {
     if (e.detail.item.text == '确定') {
       var page = this.data.date.start + '/' + this.data.date.end + '/' + 1;
-      this.dataLoad(this.data.type, this.data.code, 'day', page, 360 * 3);
+      this.dataLoad(this.data.type, this.data.code, 'day', page, 40000);
       this.setData({
         select_id: 'zx'
       });

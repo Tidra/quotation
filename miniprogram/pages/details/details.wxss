@@ -248,3 +248,8 @@ ec-canvas {
 .picker {
   margin: 5px 0;
 }
+
+.notes {
+  font-size: 10px;
+  margin-bottom: 5px;
+}

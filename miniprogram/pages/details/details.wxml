@@ -125,6 +125,7 @@
 
   <!-- 自选时间 -->
   <mp-dialog title="选择自定义日期" show="{{dialogShow}}" bindbuttontap="tapDialogButton" buttons="{{buttons}}">
+    <view class="notes">注意：只支持获取近三年历史数据</view>
     <picker id="start" mode="date" value="{{date.start}}" start="{{date.min}}" end="{{date.max}}" bindchange="bindDateChange">
       <view class="picker">
         开始日期: {{date.start}}
