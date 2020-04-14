@@ -29,7 +29,7 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" scroll-top="{{reset_scroll}}" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
       <view id="{{item.code}}" wx:for="{{value}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
           <view class="item width-40">
@@ -40,6 +40,12 @@
           <text class="width-20">{{item.quoteChange}}%</text>
           <text class="width-20">{{item.change}}</text>
         </view>
+      </view>
+
+      <view class='loading' bindtap="bottomReLoad">
+        <view class='ui-loading' wx:if="{{showLoading}}"></view>
+        <view class='Data' wx:if="{{showLoading}}">加载中...</view>
+        <view class='Data' wx:else>加载更多数据</view>
       </view>
     </scroll-view>
   </view>
@@ -57,7 +63,7 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+    <scroll-view style="height: {{winHeight}}px;" scroll-y="true" scroll-top="{{reset_scroll}}" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
       <view id="{{item.code}}" wx:for="{{value}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.growthRate>=0?'col-red':'col-green'}}">
           <view class="item width-40">
@@ -69,6 +75,12 @@
           <text class="width-20">{{item.growthRate}}%</text>
         </view>
         <!-- <view class="add_myself">加入自选</view> -->
+      </view>
+
+      <view class='loading' bindtap="bottomReLoad">
+        <view class='ui-loading' wx:if="{{showLoading}}"></view>
+        <view class='Data' wx:if="{{showLoading}}">加载中...</view>
+        <view class='Data' wx:else>加载更多数据</view>
       </view>
     </scroll-view>
   </view>

@@ -12,10 +12,12 @@ Page({
     avatarUrl: '../../icon/user-unlogin.png',
     nickName: '点击登录',
     logged: false,
+    showLoading: false,
     is_seach: false,
     is_sidebar: false,
     select_id: 'hushen',
     select_index: '上证',
+    select_fund: '国内',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
     page: 1,
@@ -101,8 +103,10 @@ Page({
     console.log(e.currentTarget.id);
     var id = e.currentTarget.id;
     var arr = ['closingPrice', 'quoteChange', 'change'];
-    if (this.data.select_id == 'fund')
+    if (this.data.select_id == 'fund' && this.data.select_fund == '国内')
       arr = ['unitNetWorth', 'cumulativeNetWorth', 'growthRate'];
+    else if (this.data.select_id == 'fund' && this.data.select_fund == '国外')
+      arr = ['closingPrice', 'change', 'growthRate'];
     var i = arr.indexOf(id);
     var sort_by = this.data.sort_by;
     var sort_icon = ['up-down', 'up-down', 'up-down'];
@@ -125,6 +129,7 @@ Page({
       sort_by,
       sort_icon,
       page: 1,
+      reset_scroll: 0
     });
     if (this.data.select_id == 'index') {
       this.dataLoad(this.data.select_id, this.data.sort_by, 1, this.data.select_index);
@@ -136,9 +141,19 @@ Page({
   // 指数选择显示
   selectIndex: function(e) {
     this.setData({
-      select_index: e.currentTarget.id
+      select_index: e.currentTarget.id,
+      reset_scroll: 0
     });
     this.dataLoad(this.data.select_id, 'comprehensive', 1, e.currentTarget.id);
+  },
+
+  // 基金显示
+  selectFund: function(e) {
+    this.setData({
+      select_fund: e.currentTarget.id,
+      reset_scroll: 0
+    });
+    this.dataLoad(this.data.select_id, 'comprehensive', 1);
   },
 
   // 选择显示
@@ -147,7 +162,8 @@ Page({
       select_id: e.currentTarget.id,
       sort_by: 'comprehensive',
       sort_icon: ['up-down', 'up-down', 'up-down'],
-      page: 1
+      page: 1,
+      reset_scroll: 0
     })
     if (e.currentTarget.id == 'index') {
       this.dataLoad(e.currentTarget.id, 'comprehensive', 1, this.data.select_index);
@@ -219,13 +235,16 @@ Page({
 
   //数据获取
   dataLoad: function(type, order, page, other) {
+    this.setData({
+      showLoading: true
+    })
     if (page == 'max1') {
       return;
     }
     // 显示加载图标
-    wx.showLoading({
-      title: '玩命加载中',
-    })
+    // wx.showLoading({
+    //   title: '玩命加载中',
+    // })
     if (other == undefined)
       other = '';
 
@@ -234,8 +253,10 @@ Page({
       ttype = 'gupiao_data';
     else if (type == 'uss')
       ttype = 'USA_stock_data';
-    else if (type == 'fund')
+    else if (type == 'fund' && this.data.select_fund == '国内')
       ttype = 'jijin_data';
+    else if (type == 'fund' && this.data.select_fund == '国外')
+      ttype = 'USA_fund_data';
     else if (type == 'index')
       ttype = 'shangzheng_shenzheng_data';
 
@@ -244,13 +265,23 @@ Page({
         console.log(res, typeof(res.data))
         var value = this.data.value;
         var newValue;
-        if (type == 'fund') {
+        if (ttype == 'jijin_data') {
           newValue = res.data.map(function(e) {
             return {
               code: e.code,
               name: e.fundName,
               unitNetWorth: e.unitNetWorth.toFixed(3),
               cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
+              growthRate: e.growthRate.toFixed(2)
+            }
+          });
+        } else if (ttype == 'USA_fund_data'){
+          newValue = res.data.map(function (e) {
+            return {
+              code: e.code,
+              name: e.fundName,
+              closingPrice: e.closingPrice,
+              change: e.change,
               growthRate: e.growthRate.toFixed(2)
             }
           });
@@ -276,11 +307,12 @@ Page({
         }
 
         // 隐藏加载框
-        wx.hideLoading();
+        // wx.hideLoading();
 
         this.setData({
           value,
-          page
+          page,
+          showLoading: false
         });
       })
       .catch(err => {
@@ -289,11 +321,14 @@ Page({
           title: '网络错误',
           icon: 'none',
           duration: 2000 //持续的时间
+        });
+        that.setData({
+          showLoading: false
         })
       });
-    setTimeout(function() {
-      wx.hideLoading()
-    }, 5000)
+    // setTimeout(function() {
+    //   wx.hideLoading()
+    // }, 5000)
   },
 
   //指数栏加载
@@ -344,7 +379,7 @@ Page({
     this.dataLoad('hushen', 'comprehensive', 1);
     this.loadIndex('hushen');
     this.setData({
-      winHeight: wx.getSystemInfoSync().windowHeight - 194
+      winHeight: wx.getSystemInfoSync().windowHeight - 196
     })
 
     // 获取用户信息

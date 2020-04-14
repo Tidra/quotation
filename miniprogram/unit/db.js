@@ -60,6 +60,7 @@ const getData = {
       order = 'comprehensive';
     }
     url_data += order + '/' + start.toString() + '/11';
+    console.log(url_data)
     return request(GET, url_data)
   },
   // 模糊查询

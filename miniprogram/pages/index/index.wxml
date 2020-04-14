@@ -17,7 +17,7 @@
       <text id="index" class="{{select_id=='index'?'opt-yes':'opt-no'}}" bindtap="select">指数</text>
       <text id="others" class="{{select_id=='others'?'opt-yes':'opt-no'}}" bindtap="select">其他</text>
     </view>
-    <scroll-view scroll-x="true" class="pre-items" wx:if="{{select_id!='index'}}">
+    <scroll-view scroll-x="true" class="pre-items" wx:if="{{select_id=='hushen'}}">
       <navigator url="/pages/details/details?code={{item.code}}&type=index" class="pre-item {{item.change>0?'col-red':'col-green'}}" wx:for="{{value_index[select_id]}}" data-item="item">
         <view class="pre-name">{{item.name}}</view>
         <view class="pre-sum">{{item.current}}</view>
@@ -27,9 +27,13 @@
         </view>
       </navigator>
     </scroll-view>
-    <view class="pic-opt" wx:else>
+    <view class="pic-opt" wx:if="{{select_id=='index'}}">
       <text id="上证" class="{{select_index=='上证'?'pic-sel':'pic-nosel'}}" bindtap="selectIndex">上证</text>
       <text id="深证" class="{{select_index=='深证'?'pic-sel':'pic-nosel'}}" bindtap="selectIndex">深证</text>
+    </view>
+    <view class="pic-opt" wx:if="{{select_id=='fund'}}">
+      <text id="国内" class="{{select_fund=='国内'?'pic-sel':'pic-nosel'}}" bindtap="selectFund">国内</text>
+      <text id="国外" class="{{select_fund=='国外'?'pic-sel':'pic-nosel'}}" bindtap="selectFund">国外</text>
     </view>
   </view>
 
@@ -47,7 +51,7 @@
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <scroll-view scroll-y="true" style="height: {{select_id=='index'?winHeight+39:winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+    <scroll-view scroll-y="true" scroll-top="{{reset_scroll}}" style="height: {{select_id=='index'?winHeight+39:winHeight}}px;" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
       <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.change>=0?'col-red':'col-green'}}">
           <view class="item width-40">
@@ -60,34 +64,54 @@
         </view>
         <!-- <view class="add_myself">加入自选</view> -->
       </view>
+
+      <view class='loading' bindtap="bottomReLoad">
+        <view class='ui-loading' wx:if="{{showLoading}}"></view>
+        <view class='Data' wx:if="{{showLoading}}">加载中...</view>
+        <view class='Data' wx:else>加载更多数据</view>
+      </view>
     </scroll-view>
   </view>
   <!-- 基金 -->
   <view class="inf" wx:else>
     <view class="inf-opt">
       <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">基金名称</view>
-      <view id="unitNetWorth" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">净值
+      <view id="unitNetWorth" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort" wx:if="{{select_fund=='国内'}}">净值
         <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
       </view>
-      <view id="cumulativeNetWorth" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">累净值
+      <view id="closingPrice" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort" wx:else>收盘价
+        <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
+      </view>
+      <view id="cumulativeNetWorth" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort" wx:if="{{select_fund=='国内'}}">累净值
         <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
+      </view>
+      <view id="change" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort" wx:else>涨跌
+        <image class="opt-icon" src="../../icon/{{sort_icon[01]}}.png"></image>
       </view>
       <view id="growthRate" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">增长率
         <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
       </view>
     </view>
-    <scroll-view style="height: {{winHeight+62}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
+    <scroll-view style="height: {{winHeight+39}}px;" scroll-y="true" scroll-top="{{reset_scroll}}" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
       <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
         <view class="inf-item {{item.growthRate>=0?'col-red':'col-green'}}">
           <view class="item width-40">
             <text class="name">{{item.name}}</text>
             <text class="code">{{item.code}}</text>
           </view>
-          <text class="width-20">{{item.unitNetWorth}}</text>
-          <text class="width-20">{{item.cumulativeNetWorth}}</text>
+          <text class="width-20" wx:if="{{select_fund=='国内'}}">{{item.unitNetWorth}}</text>
+          <text class="width-20" wx:else>{{item.closingPrice}}</text>
+          <text class="width-20" wx:if="{{select_fund=='国内'}}">{{item.cumulativeNetWorth}}</text>
+          <text class="width-20" wx:else>{{item.change}}</text>
           <text class="width-20">{{item.growthRate}}%</text>
         </view>
         <!-- <view class="add_myself">加入自选</view> -->
+      </view>
+
+      <view class='loading' bindtap="bottomReLoad">
+        <view class='ui-loading' wx:if="{{showLoading}}"></view>
+        <view class='Data' wx:if="{{showLoading}}">加载中...</view>
+        <view class='Data' wx:else>点击加载更多数据</view>
       </view>
     </scroll-view>
   </view>

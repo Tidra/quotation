@@ -17,7 +17,8 @@ Page({
     this.setData({
       select_id: e.currentTarget.id,
       sort_by: 'comprehensive',
-      sort_icon: ['up-down', 'up-down', 'up-down']
+      sort_icon: ['up-down', 'up-down', 'up-down'],
+      reset_scroll: 0
     });
     this.dataLoad(e.currentTarget.id, this.data.seach_value, 'comprehensive', 1);
   },
@@ -51,6 +52,7 @@ Page({
       sort_by,
       sort_icon,
       page: 1,
+      reset_scroll: 0
     });
     this.dataLoad(this.data.select_id, this.data.seach_value, sort_by, 1)
   },
