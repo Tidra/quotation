@@ -24,6 +24,29 @@
   margin-right: 20px;
 }
 
+.data .down-data {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 26rpx;
+  margin: 6px 0;
+}
+
+.data .down-data .row {
+  width: 30%;
+  display: flex;
+  justify-content: space-between;
+  margin: 5rpx 0;
+}
+
+.data .down-data .row-two {
+  width: 45%;
+  display: flex;
+  justify-content: space-between;
+  margin: 5rpx 0;
+}
+
 .pic-opt .pic-sel,.pic-opt .pic-nosel {
   width: 33.3%;
 }

@@ -80,7 +80,7 @@ Page({
     } else {
       if (this.data.select_id == 'fund') {
         wx.navigateTo({
-          url: '/pages/fund/fund?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
+          url: '/pages/fund/fund?code=' + e.currentTarget.id + '&type=' + this.data.select_fund,
         })
       } else {
         wx.navigateTo({
@@ -142,6 +142,9 @@ Page({
   selectIndex: function(e) {
     this.setData({
       select_index: e.currentTarget.id,
+      sort_by: 'comprehensive',
+      sort_icon: ['up-down', 'up-down', 'up-down'],
+      page: 1,
       reset_scroll: 0
     });
     this.dataLoad(this.data.select_id, 'comprehensive', 1, e.currentTarget.id);
@@ -151,6 +154,9 @@ Page({
   selectFund: function(e) {
     this.setData({
       select_fund: e.currentTarget.id,
+      sort_by: 'comprehensive',
+      sort_icon: ['up-down', 'up-down', 'up-down'],
+      page: 1,
       reset_scroll: 0
     });
     this.dataLoad(this.data.select_id, 'comprehensive', 1);

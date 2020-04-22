@@ -15,11 +15,6 @@ function setOption(chart, data, name) {
     dataset: {
       source: data
     },
-    // legend: {
-    //   top: 30,
-    //   left: 'center',
-    //   data: [name, 'MA5', 'MA10', 'MA20', 'MA30'],
-    // },
     tooltip: {
       trigger: 'axis',
       axisPointer: {
@@ -30,7 +25,7 @@ function setOption(chart, data, name) {
     grid: [{
       top: 15,
       bottom: 25,
-      right: '5%'
+      right: '2%'
     }],
     xAxis: [{
       type: 'category',
@@ -98,7 +93,7 @@ Page({
     },
     addOrDelete: true,
     is_hide: 'none',
-    select_id: 'growthRate',
+    select_id: 'first',
     value: '',
   },
 
@@ -106,18 +101,22 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    this.dataLoad('jijin_data', options.code, 'day', 100);
+    var type = 'jijin_data';
+    if (options.type == "国外")
+      type = 'USA_fund_data'
+    this.dataLoad(type, options.code, 'day', 100);
     if (app.globalData.openid) {
-      this.onQuery(options.code, 'jijin_data');
+      this.onQuery(options.code, type);
     }
 
     this.setData({
-      code: options.code
+      code: options.code,
+      type
     });
   },
 
   // 查询是否存在
-  onQuery: function (code, type) {
+  onQuery: function(code, type) {
     const db = wx.cloud.database()
     // 查询当前用户的 counters
     db.collection('joinquant').where({
@@ -145,7 +144,7 @@ Page({
   },
 
   // 删除自选
-  deleteMy: function () {
+  deleteMy: function() {
     var that = this;
     wx.showModal({
       title: '',
@@ -170,7 +169,7 @@ Page({
               console.error('[数据库] [删除记录] 失败：', err)
             }
           })
-        } else if (res.cancel) { }
+        } else if (res.cancel) {}
       }
     })
   },
@@ -201,7 +200,7 @@ Page({
     var that = this;
     db.collection('joinquant').add({
       data: {
-        type: 'jijin_data',
+        type: that.data.type,
         code: that.data.code,
         name: that.data.value.name,
         date: that.data.value.date
@@ -230,6 +229,7 @@ Page({
 
   // 选择显示图表
   select: function(e) {
+    console.log(e)
     if (this.data.select_id == e.currentTarget.id) {
       return;
     }
@@ -237,7 +237,7 @@ Page({
       select_id: e.currentTarget.id
     });
     globalData.values = this.data.all_value[e.currentTarget.id];
-    setOption(chart, globalData, e.currentTarget.id);
+    setOption(chart, globalData, e.currentTarget.dataset.name);
   },
 
   // 显示搜索框
@@ -274,38 +274,76 @@ Page({
         //请求成功
         var size = 75;
         var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
-        if (len > 16) {
+        if (len > 25) {
+          size = 45;
+        } else if (len > 16) {
           size = 55;
         } else if (len > 10) {
           size = 75 - (len - 10) * 4;
         }
-        var value = {
-          name: res.data[0].fundName,
-          code: res.data[0].code,
-          size: size,
-          date: res.data[0].date,
-          unitNetWorth: res.data[0].unitNetWorth,
-          cumulativeNetWorth: res.data[0].cumulativeNetWorth,
-          growthRate: res.data[0].growthRate.toFixed(4)
-        }
 
+        var value = {}
         var all_value = {
           date: [],
-          unitNetWorth: [],
-          cumulativeNetWorth: [],
-          growthRate: []
+          first: [],
+          second: [],
+          third: []
         };
         len = res.data.length;
-        for (var i in res.data) {
-          all_value.date.push(res.data[len - i - 1].date);
-          all_value.unitNetWorth.push(res.data[len - i - 1].unitNetWorth);
-          all_value.cumulativeNetWorth.push(res.data[len - i - 1].cumulativeNetWorth);
-          all_value.growthRate.push(res.data[len - i - 1].growthRate.toFixed(4));
+
+        if (type == 'jijin_data') {
+          value = {
+            name: res.data[0].fundName,
+            code: res.data[0].code,
+            size: size,
+            date: res.data[0].date,
+            unitNetWorth: res.data[0].unitNetWorth,
+            cumulativeNetWorth: res.data[0].cumulativeNetWorth,
+            growthRate: res.data[0].growthRate.toFixed(4)
+          }
+          for (var i in res.data) {
+            all_value.date.push(res.data[len - i - 1].date);
+            all_value.first.push(res.data[len - i - 1].growthRate.toFixed(4));
+            all_value.second.push(res.data[len - i - 1].unitNetWorth);
+            all_value.third.push(res.data[len - i - 1].cumulativeNetWorth);
+          }
+        } else {
+          value = {
+            name: res.data[0].fundName,
+            code: res.data[0].code,
+            size: size,
+            date: res.data[0].date,
+            company: res.data[0].company,
+            closingPrice: res.data[0].closingPrice,
+            growthRate: res.data[0].growthRate.toFixed(4),
+            previousClose: res.data[0].previousClose,
+            change: res.data[0].change,
+            oneYearChange: res.data[0].oneYearChange,
+            turnover: res.data[0].turnover,
+            roe: res.data[0].roe,
+            roa: res.data[0].roa,
+            morningstarRating: res.data[0].morningstarRating,
+            riskRating: res.data[0].riskRating,
+            ttmyield: res.data[0].ttmyield,
+            ytdfundReturn: res.data[0].ytdfundReturn,
+            threeMonthFundReturn: res.data[0].threeMonthFundReturn,
+            oneYearFundReturn: res.data[0].oneYearFundReturn,
+            threeYearFundReturn: res.data[0].threeYearFundReturn,
+            fiveYearFundReturn: res.data[0].fiveYearFundReturn,
+            totalAssets: res.data[0].totalAssets,
+            totalMarketCapitalization: res.data[0].totalMarketCapitalization,
+          }
+          for (var i in res.data) {
+            all_value.date.push(res.data[len - i - 1].date);
+            all_value.first.push(res.data[len - i - 1].growthRate.toFixed(4));
+            all_value.second.push(res.data[len - i - 1].closingPrice);
+            all_value.third.push(res.data[len - i - 1].change);
+          }
         }
         console.log(all_value);
         globalData = {
           "categoryData": all_value.date,
-          "values": all_value.growthRate
+          "values": all_value.first
         }
 
         setOption(chart, globalData, '增长率');
@@ -341,11 +379,11 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
-    this.dataLoad('jijin_data', this.data.code, 'day', 100);
-    this.onQuery(this.data.code, 'jijin_data');
+    this.dataLoad(this.data.type, this.data.code, 'day', 100);
+    this.onQuery(this.data.code, this.data.type);
 
     this.setData({
-      select_id: 'growthRate'
+      select_id: 'first'
     });
     setTimeout(function() {
       // 隐藏导航栏加载框
