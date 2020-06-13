@@ -1,15 +1,15 @@
 <!--miniprogram/pages/fund/fund.wxml-->
-<view class="container">
+<view class="container {{theme}}">
   <!--数据部分-->
   <view class="head">
     <view class="title" style="font-size: {{value.size}}rpx">{{value.name}}
       <text class="code">{{value.code}}</text>
     </view>
-    <image wx:if="{{addOrDelete}}" class="seach" src='/icon/add.png' mode="aspectFit" bindtap="addMy"></image>
-    <image wx:else class="seach" src='/icon/delete.png' mode="aspectFit" bindtap="deleteMy"></image>
+    <image wx:if="{{addOrDelete}}" class="seach" src='/icon/{{theme}}-add.png' mode="aspectFit" bindtap="addMy"></image>
+    <image wx:else class="seach" src='/icon/{{theme}}-delete.png' mode="aspectFit" bindtap="deleteMy"></image>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
-  <view class="data">
+  <view class="data col-next">
     <view class="half-left" wx:if="{{type == 'jijin_data'}}">
       <view>最新净值({{value.date}})</view>
       <view class="value {{value.growthRate>=0?'col-red':'col-green'}}">{{value.cumulativeNetWorth}}</view>
@@ -30,7 +30,7 @@
     <view class="down-data" wx:else>
       <view class="row">
         <view>前收盘</view>
-        <view class="col-white">{{value.previousClose}}</view>
+        <view class="col-main">{{value.previousClose}}</view>
       </view>
       <view class="row">
         <view>涨跌额</view>
@@ -38,68 +38,69 @@
       </view>
       <view class="row">
         <view>一年涨跌幅</view>
-        <view class="col-white">{{value.oneYearChange}}%</view>
+        <view class="col-main">{{value.oneYearChange}}%</view>
       </view>
       <view class="row">
         <view>周转率</view>
-        <view class="col-white">{{value.turnover}}%</view>
+        <view class="col-main">{{value.turnover}}%</view>
       </view>
       <view class="row">
         <view>ROE</view>
-        <view class="col-white">{{value.roe}}%</view>
+        <view class="col-main">{{value.roe}}%</view>
       </view>
       <view class="row">
         <view>ROA</view>
-        <view class="col-white">{{value.roa}}%</view>
+        <view class="col-main">{{value.roa}}%</view>
       </view>
       <view class="row">
         <view>总资产</view>
-        <view class="col-white">{{value.totalAssets}}</view>
+        <view class="col-main">{{value.totalAssets}}</view>
       </view>
       <view class="row">
         <view>总市值</view>
-        <view class="col-white">{{value.totalMarketCapitalization}}</view>
+        <view class="col-main">{{value.totalMarketCapitalization}}</view>
       </view>
       <view class="row">
       </view>
       <view class="row">
         <view>晨星评级</view>
-        <view class="col-white">{{value.morningstarRating}}</view>
+        <view class="col-main">{{value.morningstarRating}}</view>
       </view>
       <view class="row">
         <view>风险评级</view>
-        <view class="col-white">{{value.riskRating}}</view>
+        <view class="col-main">{{value.riskRating}}</view>
       </view>
       <view class="row">
       </view>
       <view class="row-two">
         <view>过去十二个月收益率</view>
-        <view class="col-white">{{value.ttmyield}}%</view>
+        <view class="col-main">{{value.ttmyield}}%</view>
       </view>
       <view class="row-two">
         <view>年初至今基金回报</view>
-        <view class="col-white">{{value.ytdfundReturn}}%</view>
+        <view class="col-main">{{value.ytdfundReturn}}%</view>
       </view>
       <view class="row-two">
         <view>三个月基金回报</view>
-        <view class="col-white">{{value.threeMonthFundReturn}}%</view>
+        <view class="col-main">{{value.threeMonthFundReturn}}%</view>
       </view>
       <view class="row-two">
         <view>一年基金回报</view>
-        <view class="col-white">{{value.oneYearFundReturn}}%</view>
+        <view class="col-main">{{value.oneYearFundReturn}}%</view>
       </view>
       <view class="row-two">
         <view>三年基金回报</view>
-        <view class="col-white">{{value.threeYearFundReturn}}%</view>
+        <view class="col-main">{{value.threeYearFundReturn}}%</view>
       </view>
       <view class="row-two">
         <view>五年基金回报</view>
-        <view class="col-white">{{value.fiveYearFundReturn}}%</view>
+        <view class="col-main">{{value.fiveYearFundReturn}}%</view>
       </view>
     </view>
   </view>
 
   <!--图例部分-->
+  <view class="space"></view>
   <view class="pic">
     <view class="pic-opt">
       <text id="first" class="{{select_id=='first'?'pic-sel':'pic-nosel'}}" bindtap="select" data-name="增长率">增长率</text>
@@ -130,14 +131,7 @@
     </scroll-view>
   </view>
 
-  <!-- 搜索遮罩 -->
-  <view class="shade" style="display:{{is_hide}};" bindtap="seachIs"></view>
-  <form bindsubmit="seach" style="display:{{is_hide}}; width:90%;">
-    <view class="in-seach">
-      <image class="seach" src='/icon/seach.png' mode="aspectFit"></image>
-      <input name="seach_value" focus="true" confirm-type="search" placeholder="股票名称/代码" bindconfirm="seach"></input>
-      <button form-type="submit">搜索</button>
-    </view>
-  </form>
+  <!-- 搜索框 -->
+  <seach show="{{is_hide}}"></seach>
 
 </view>

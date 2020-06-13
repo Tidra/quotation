@@ -1,14 +1,23 @@
 /* miniprogram/pages/user/user.wxss */
+@import '../../style/itheme.wxss';
 
 /* 标题栏 */
 
 .head {
-  background-color: #0e0e0e;
+  background-color: #2990dc;
   width: 100%;
   padding: 10px 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+}
+
+.light .head {
+  color: #fff;
+}
+
+.dark .head {
+  background-color: #1e1e1e;
 }
 
 .head .more {
@@ -28,28 +37,55 @@
   margin-right: 5%;
 }
 
-/* 类型 */
-
-.pic-opt {
-  width: 90%;
+.inshow-item {
+  width: 95%;
   display: flex;
-  margin: 8px auto;
-  border: 1px solid grey;
-  border-radius: 5px;
+  white-space: nowrap;
+  overflow: scroll;
+  color: #363636;
+  mask-image: linear-gradient(to right, #00000000 0, #f4f4f4 10%, #f4f4f4 90%, #00000000 100%);
+  -webkit-mask-image: linear-gradient(to right, #00000000 0, #f4f4f4 10%, #f4f4f4 90%, #00000000 100%);
 }
 
-.pic-opt text:not(:first-child) {
-  border-left: 1px solid grey;
+.dark .inshow-item {
+  color: #f0f0f0;
+  mask-image: linear-gradient(to right, #00000000 0, #1e1e1e 10%, #1e1e1e 90%, #00000000 100%);
+  -webkit-mask-image: linear-gradient(to right, #00000000 0, #1e1e1e 10%, #1e1e1e 90%, #00000000 100%);
 }
 
-.pic-opt .pic-sel {
-  width: 25%;
+.inshow-item::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+.inshow-item>view view {
   text-align: center;
-  color: #fff;
-  background: rgba(165, 165, 165, 0.863);
+  margin: 0 13px;
+  padding: 8px 0;
 }
 
-.pic-opt .pic-nosel {
-  width: 25%;
-  text-align: center;
+.inshow-item>view:first-child view {
+  margin-left: 25px;
+}
+
+.inshow-item>view:last-child view {
+  margin-right: 25px;
+}
+
+.inshow-item .opt-yes {
+  color: #2990dc;
+  position: relative;
+}
+
+.inshow-item .opt-yes::before {
+  content: "";
+  position: absolute;
+  display: block;
+  bottom: 0;
+  height: 2px;
+  background: #2990dc;
+  right: 0;
+  left: 0;
+  border-radius: 10px;
 }

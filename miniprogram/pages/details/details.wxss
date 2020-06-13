@@ -1,4 +1,5 @@
 /* miniprogram/pages/details/details.wxss */
+@import '../../style/itheme.wxss';
 
 /* 名称 */
 
@@ -8,18 +9,26 @@
   justify-content: space-between;
   align-items: center;
   padding: 5rpx 5%;
-  background: #0e0e0e;
+  background-color: #2990dc;
+}
+
+.dark .head {
+  background-color: #1e1e1e;
 }
 
 .head .title {
   width: 75%;
   font-size: 75rpx;
-  color: white;
+  color: #f0f0f0;
 }
 
 .head .code {
   font-size: 14px;
-  color: grey;
+  color: #4c4c4c;
+}
+
+.dark .head .code {
+  color: #ababab;
 }
 
 .head .seach {
@@ -31,12 +40,10 @@
 
 .data {
   width: 95%;
-  background: #0e0e0e;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   padding: 0 2.5%;
-  margin: 7px 0;
   font-size: 34rpx;
 }
 
@@ -113,13 +120,18 @@
   margin-top: 2rpx;
   margin-left: 12%;
   padding: 3rpx 5% 5rpx 5%;
-  background: #242424;
+  background-color: #999;
+  color: #f0f0f0;
 }
 
 .row-line {
   width: 100%;
   height: 3px;
-  background: #242424;
+  background-color: #999;
+}
+
+.dark .row-button, .dark .row-line {
+  background-color: #242424;
 }
 
 .down-data .row-two {
@@ -141,31 +153,6 @@
 
 .pic {
   width: 100%;
-  background: #0e0e0e;
-}
-
-.pic-opt {
-  width: 95%;
-  display: flex;
-  margin: 5px auto;
-  border: 1px solid grey;
-  border-radius: 5px;
-}
-
-.pic-opt text:not(:first-child) {
-  border-left: 1px solid grey;
-}
-
-.pic-opt .pic-sel {
-  width: 20%;
-  text-align: center;
-  color: #fff;
-  background: rgba(165, 165, 165, 0.863);
-}
-
-.pic-opt .pic-nosel {
-  width: 20%;
-  text-align: center;
 }
 
 /* 图 */
@@ -184,6 +171,7 @@ ec-canvas {
 }
 
 /* 自选框 */
+
 .picker {
   margin: 5px 0;
 }
@@ -191,4 +179,8 @@ ec-canvas {
 .notes {
   font-size: 10px;
   margin-bottom: 5px;
+}
+
+.dialog {
+  color: #363636;
 }

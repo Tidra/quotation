@@ -1,6 +1,8 @@
 {
+  "navigationBarTitleText": "详情",
   "enablePullDownRefresh": true,
   "usingComponents": {
-    "ec-canvas": "../../ec-canvas/ec-canvas"
+    "ec-canvas": "../../ec-canvas/ec-canvas",
+    "seach": "../../unit/seach/seach"
   }
 }

@@ -1,6 +1,8 @@
 // miniprogram/pages/index/index.js
 var db = require('../../unit/db.js')
+const style = require("../../unit/setStyle.js")
 const app = getApp()
+const windowHeight = wx.getSystemInfoSync().windowHeight - 193
 
 Page({
 
@@ -8,23 +10,21 @@ Page({
    * 页面的初始数据
    */
   data: {
+    theme: app.globalData.theme,
     lock: false,
-    avatarUrl: '../../icon/user-unlogin.png',
-    nickName: '点击登录',
-    logged: false,
     showLoading: false,
     is_seach: false,
     is_sidebar: false,
     select_id: 'hushen',
     select_index: '上证',
-    select_fund: '国内',
+    select_fund: 'jijin_data',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
     page: 1,
     /**
      * code:代码
      * name:名称
-     * current:当前价
+     * closingPrice:当前价
      * previousClose:昨收价
      * quoteChange:涨幅 (当前-昨收)/昨收
      * change:涨跌 (当前-昨收)
@@ -33,26 +33,26 @@ Page({
       hushen: [{
         code: '000001',
         name: '上证指数',
-        current: '-',
+        closingPrice: '-',
         previousClose: '-',
         quoteChange: '-',
         change: '-'
       }, {
         code: '000906',
         name: '中证800',
-        current: '-',
+        closingPrice: '-',
         quoteChange: '-',
         change: '-'
       }, {
         code: '399004',
         name: '深证100R',
-        current: '-',
+        closingPrice: '-',
         quoteChange: '-',
         change: '-'
       }, {
         code: '399005',
         name: '中小板指',
-        current: '-',
+        closingPrice: '-',
         quoteChange: '-',
         change: '-'
       }],
@@ -100,12 +100,12 @@ Page({
 
   // 排序
   sort: function(e) {
-    console.log(e.currentTarget.id);
+    // console.log(e.currentTarget.id);
     var id = e.currentTarget.id;
     var arr = ['closingPrice', 'quoteChange', 'change'];
-    if (this.data.select_id == 'fund' && this.data.select_fund == '国内')
+    if (this.data.select_id == 'fund' && this.data.select_fund == 'jijin_data')
       arr = ['unitNetWorth', 'cumulativeNetWorth', 'growthRate'];
-    else if (this.data.select_id == 'fund' && this.data.select_fund == '国外')
+    else if (this.data.select_id == 'fund' && this.data.select_fund == 'USA_fund_data')
       arr = ['closingPrice', 'change', 'growthRate'];
     var i = arr.indexOf(id);
     var sort_by = this.data.sort_by;
@@ -117,7 +117,7 @@ Page({
       sort_by = id;
     } else {
       if (sort_by == id + 'Drop') {
-        console.log(sort_by)
+        // console.log(sort_by)
         sort_by = id + 'Rise';
         sort_icon[i] = 'up';
       } else {
@@ -164,19 +164,36 @@ Page({
 
   // 选择显示
   select: function(e) {
+    console.log
+    var winHeight = windowHeight;
+    if (e.currentTarget.id == 'others') {
+      this.setData({
+        select_id: e.currentTarget.id
+      })
+      return
+    } else if (e.currentTarget.id == 'index') {
+      this.dataLoad(e.currentTarget.id, 'comprehensive', 1, this.data.select_index);
+      winHeight = winHeight + 39;
+    } else if (e.currentTarget.id == 'hushen') {
+      this.dataLoad(e.currentTarget.id, 'comprehensive', 1);
+      if (this.data.value_index['hushen'].length == 0) {
+        this.loadIndex(e.currentTarget.id);
+      }
+    } else if (e.currentTarget.id == 'uss') {
+      this.dataLoad(e.currentTarget.id, 'comprehensive', 1);
+      winHeight = winHeight + 78;
+    } else {
+      this.dataLoad(e.currentTarget.id, 'comprehensive', 1);
+      winHeight = winHeight + 39;
+    }
     this.setData({
       select_id: e.currentTarget.id,
       sort_by: 'comprehensive',
       sort_icon: ['up-down', 'up-down', 'up-down'],
       page: 1,
-      reset_scroll: 0
+      reset_scroll: 0,
+      winHeight
     })
-    if (e.currentTarget.id == 'index') {
-      this.dataLoad(e.currentTarget.id, 'comprehensive', 1, this.data.select_index);
-      return;
-    }
-    this.dataLoad(e.currentTarget.id, 'comprehensive', 1)
-    this.loadIndex(e.currentTarget.id);
   },
 
   // 显示搜索框
@@ -193,64 +210,14 @@ Page({
     })
   },
 
-  //显示更多
-  showMore: function() {
-    var that = this;
-    if (this.data.logged) {
-      that.closeAll();
-      wx.navigateTo({
-        url: '/pages/user/user',
-      })
-    } else {
-      //登录提示
-      wx.showModal({
-        title: '',
-        content: '您尚未登录，请登录后再操作',
-        success(res) {
-          if (res.confirm) {
-            console.log('用户点击确定');
-          } else if (res.cancel) {
-            that.closeAll();
-            console.log('用户点击取消');
-          }
-        }
-      })
-    }
-  },
-
-  //关闭所有
-  closeAll: function() {
-    this.setData({
-      is_sidebar: false,
-      is_seach: false
-    })
-  },
-
-  seach: function(e) {
-    this.closeAll();
-    var seach_value = "";
-    if (typeof(e.detail.value) == 'string') {
-      seach_value = e.detail.value;
-    } else {
-      seach_value = e.detail.value.seach_value;
-    }
-    wx.navigateTo({
-      url: '/pages/seach/seach?seach_value=' + seach_value,
-    })
-  },
-
   //数据获取
   dataLoad: function(type, order, page, other) {
-    this.setData({
-      showLoading: true
-    })
     if (page == 'max1') {
       return;
     }
-    // 显示加载图标
-    // wx.showLoading({
-    //   title: '玩命加载中',
-    // })
+    this.setData({
+      showLoading: true
+    })
     if (other == undefined)
       other = '';
 
@@ -259,82 +226,73 @@ Page({
       ttype = 'gupiao_data';
     else if (type == 'uss')
       ttype = 'USA_stock_data';
-    else if (type == 'fund' && this.data.select_fund == '国内')
-      ttype = 'jijin_data';
-    else if (type == 'fund' && this.data.select_fund == '国外')
-      ttype = 'USA_fund_data';
+    else if (type == 'fund')
+      ttype = this.data.select_fund;
     else if (type == 'index')
       ttype = 'shangzheng_shenzheng_data';
 
     db.getData.selectAll(ttype, order, page, other).then(res => {
-        //请求成功
-        console.log(res, typeof(res.data))
-        var value = this.data.value;
-        var newValue;
-        if (ttype == 'jijin_data') {
-          newValue = res.data.map(function(e) {
-            return {
-              code: e.code,
-              name: e.fundName,
-              unitNetWorth: e.unitNetWorth.toFixed(3),
-              cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
-              growthRate: e.growthRate.toFixed(2)
-            }
-          });
-        } else if (ttype == 'USA_fund_data'){
-          newValue = res.data.map(function (e) {
-            return {
-              code: e.code,
-              name: e.fundName,
-              closingPrice: e.closingPrice,
-              change: e.change,
-              growthRate: e.growthRate.toFixed(2)
-            }
-          });
-        } else {
-          newValue = res.data.map(function(e) {
-            return {
-              code: e.code,
-              name: e.name,
-              current: e.closingPrice,
-              previousClose: e.previousClose,
-              quoteChange: e.quoteChange,
-              change: e.change
-            }
-          });
-        }
-        if (page == 1) {
-          value[type] = newValue;
-        } else {
-          value[type] = value[type].concat(newValue);
-        }
-        if (newValue.length == 0) {
-          page = 'max'
-        }
-
-        // 隐藏加载框
-        // wx.hideLoading();
-
-        this.setData({
-          value,
-          page,
-          showLoading: false
+      //请求成功
+      // console.log(res, typeof(res.data))
+      var value = this.data.value;
+      var newValue;
+      if (ttype == 'jijin_data') {
+        newValue = res.data.map(function(e) {
+          return {
+            code: e.code,
+            name: e.fundName,
+            unitNetWorth: e.unitNetWorth.toFixed(3),
+            cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
+            growthRate: e.growthRate.toFixed(2)
+          }
         });
-      })
-      .catch(err => {
-        //请求失败
-        wx.showToast({
-          title: '网络错误',
-          icon: 'none',
-          duration: 2000 //持续的时间
+      } else if (ttype == 'USA_fund_data') {
+        newValue = res.data.map(function(e) {
+          return {
+            code: e.code,
+            name: e.fundName,
+            closingPrice: e.closingPrice,
+            change: e.change,
+            growthRate: e.growthRate.toFixed(2)
+          }
         });
-        that.setData({
-          showLoading: false
-        })
+      } else {
+        newValue = res.data.map(function(e) {
+          return {
+            code: e.code,
+            name: e.name,
+            closingPrice: e.closingPrice,
+            previousClose: e.previousClose,
+            quoteChange: e.quoteChange,
+            change: e.change
+          }
+        });
+      }
+      if (page == 1) {
+        value[type] = newValue;
+      } else {
+        value[type] = value[type].concat(newValue);
+      }
+      if (newValue.length == 0) {
+        page = 'max'
+      }
+
+      this.setData({
+        value,
+        page,
+        showLoading: false
       });
-    // setTimeout(function() {
-    //   wx.hideLoading()
-    // }, 5000)
+    }).catch(err => {
+      //请求失败
+      wx.showToast({
+        title: '网络错误',
+        icon: 'none',
+        duration: 2000 //持续的时间
+      });
+      this.setData({
+        showLoading: false
+      })
+    });
   },
 
   //指数栏加载
@@ -354,7 +312,7 @@ Page({
         var value = {
           code: res.data[0].code,
           name: res.data[0].name,
-          current: res.data[0].closingPrice,
+          closingPrice: res.data[0].closingPrice,
           change: res.data[0].change,
           quoteChange: res.data[0].quoteChange
         }
@@ -385,112 +343,37 @@ Page({
     this.dataLoad('hushen', 'comprehensive', 1);
     this.loadIndex('hushen');
     this.setData({
-      winHeight: wx.getSystemInfoSync().windowHeight - 196
+      winHeight: windowHeight
     })
-
-    // 获取用户信息
-    wx.getSetting({
-      success: res => {
-        if (res.authSetting['scope.userInfo']) {
-          // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
-          wx.getUserInfo({
-            success: res => {
-              this.setData({
-                avatarUrl: res.userInfo.avatarUrl
-              })
-            }
-          })
-        }
-      }
-    })
-  },
-
-  onGetUserInfo: function(e) {
-    if (!this.data.logged && e.detail.userInfo) {
-      this.setData({
-        logged: true,
-        avatarUrl: e.detail.userInfo.avatarUrl,
-        nickName: e.detail.userInfo.nickName
-      });
-      this.onGetOpenid();
-    }
-  },
-
-  onGetOpenid: function() {
-    // 调用云函数
-    wx.cloud.callFunction({
-      name: 'login',
-      data: {},
-      success: res => {
-        console.log('[云函数] [login] user openid: ', res.result.openid);
-        app.globalData.openid = res.result.openid;
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success',
-          duration: 2000 //持续的时间
-        });
-      },
-      fail: err => {
-        console.error('[云函数] [login] 调用失败', err)
-      }
-    })
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {
-
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function() {},
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function() {
-
+  onShow: function() {
+    style.changeStyle(app.globalData.theme, false)
+    this.setData({
+      theme: app.globalData.theme
+    })
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function() {
+  onRefresh: function() {
     // 显示顶部刷新图标
-    wx.showNavigationBarLoading();
-    if (this.data.select_id == 'index') {
+    if (this.data.select_id == 'hushen') {
+      this.dataLoad(this.data.select_id, this.data.sort_by, 1);
+      this.loadIndex(this.data.select_id);
+    } else if (this.data.select_id == 'index') {
       this.dataLoad(this.data.select_id, this.data.sort_by, 1, this.data.select_index);
     } else {
-      this.loadIndex(this.data.select_id);
       this.dataLoad(this.data.select_id, this.data.sort_by, 1);
     }
-    setTimeout(function() {
-      // 隐藏导航栏加载框
-      wx.hideNavigationBarLoading();
-      // 停止下拉动作
-      wx.stopPullDownRefresh();
-    }, 500)
-  },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function() {},
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function() {
-
+    this.setData({
+      page: 1,
+      refTri: false
+    })
   }
 })

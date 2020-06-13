@@ -1,0 +1,22 @@
+{
+  "name": "quotation",
+  "version": "1.0.0",
+  "description": "关于本行情分析小程序，主要用于行情数据的详细数据显示、分析以及数据图表显示。基本的设计、数据以及预测数据走势等依照股票分析软件来设计。",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tidra/quotation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tidra/quotation/issues"
+  },
+  "homepage": "https://github.com/Tidra/quotation#readme"
+}

@@ -1,5 +1,8 @@
 {
-  "enablePullDownRefresh": true,
   "disableScroll": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "sidebar": "../../unit/sidebar/sidebar",
+    "seach": "../../unit/seach/seach",
+    "work": "../../unit/work/work"
+  }
 }

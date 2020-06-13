@@ -1,0 +1,68 @@
+/* miniprogram/pages/menu/menu.wxss */
+
+.wx-switch-input {
+  zoom: 0.8;
+  background: #2990dc !important;
+  border: none;
+}
+
+.wx-radio-input {
+  zoom: 0.6;
+}
+
+.wx-radio-input.wx-radio-input-checked {
+  border: none;
+  background: #2990dc !important;
+}
+
+.dark .wx-switch-input {
+  background: #ababab !important;
+}
+
+.dark .wx-radio-input.wx-radio-input-checked {
+  background: #ababab !important;
+}
+
+/* 标题 */
+
+.subtitle {
+  font-size: 14px;
+  color: #4c4c4c;
+  width: 90%;
+  padding: 15px 0 8px;
+}
+
+.dark .subtitle {
+  color: #ababab;
+}
+
+/* 主题选项 */
+
+.theme {
+  width: 90%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.theme-item {
+  margin: 8px 0;
+}
+
+.theme-item image{
+  width: 100px;
+  height: 100px;
+}
+
+.theme-label {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 选择开关 */
+
+.switch-item {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}

@@ -1,0 +1,198 @@
+/* unit/seach/seach.wxss */
+
+.shade {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background: rgba(19, 19, 19, 0.85);
+  transition: all 320ms ease;
+}
+
+.light, .dark {
+  background-color: #f4f4f4;
+  color: #2990dc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 150;
+  transition: all 320ms ease;
+}
+
+.dark {
+  background-color: #1e1e1e;
+  /* color: #2990dc; */
+}
+
+.seach {
+  display: flex;
+  margin: 8px;
+  width: 90%;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.in-seach {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  width: 100%;
+  z-index: 300;
+  border-radius: 3px;
+  padding: 3px 25%;
+}
+
+.dark .in-seach {
+  background-color: #242424;
+}
+
+.width-85 {
+  width: 85%;
+  padding: 3px;
+}
+
+.in-seach .seach-img {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+}
+
+.in-seach input {
+  color: #363636;
+  caret-color: #2990dc;
+  width: 80%;
+  margin: 5px;
+}
+
+.dark .in-seach input {
+  color: #f0f0f0;
+}
+
+.in-seach icon {
+  color: #f4f4f4;
+  margin-right: 5px;
+}
+
+.subtitle {
+  color: #999;
+  font-size: 12px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.item {
+  width: 70%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.item:last-child {
+  margin-bottom: 20px;
+}
+
+.item .split {
+  width: 1px;
+  height: auto;
+  background-color: #9999991e;
+}
+
+.inshow-item {
+  width: 95%;
+  display: flex;
+  white-space: nowrap;
+  overflow: scroll;
+  color: #363636;
+  mask-image: linear-gradient(to right, #00000000 0, #f4f4f4 10%, #f4f4f4 90%, #00000000 100%);
+  -webkit-mask-image: linear-gradient(to right, #00000000 0, #f4f4f4 10%, #f4f4f4 90%, #00000000 100%);
+}
+
+.dark .inshow-item {
+  color: #f0f0f0;
+  mask-image: linear-gradient(to right, #00000000 0, #1e1e1e 10%, #1e1e1e 90%, #00000000 100%);
+  -webkit-mask-image: linear-gradient(to right, #00000000 0, #1e1e1e 10%, #1e1e1e 90%, #00000000 100%);
+}
+
+.inshow-item::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+.inshow-item>view view {
+  text-align: center;
+  margin: 0 13px;
+  padding: 8px 0;
+}
+
+.inshow-item>view:first-child view {
+  margin-left: 25px;
+}
+
+.inshow-item>view:last-child view {
+  margin-right: 25px;
+}
+
+.inshow-item .opt-yes {
+  color: #2990dc;
+  position: relative;
+}
+
+.inshow-item .opt-yes::before {
+  content: "";
+  position: absolute;
+  display: block;
+  bottom: 0;
+  height: 2px;
+  background: #2990dc;
+  right: 0;
+  left: 0;
+  border-radius: 10px;
+}
+
+.seach-list {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  width: 90%;
+  color: #363636;
+  border-bottom: 1px solid #9999991e;
+}
+
+.dark .seach-list {
+  color: #f0f0f0;
+}
+
+.li {
+  display: flex;
+  align-items: center;
+}
+
+.li .ic {
+  font-size: 10px;
+  color: #fff;
+  background-color: #2990dc;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+.seach-list .delete {
+  color: red;
+}
+
+.clear-all {
+  font-size: 12px;
+  color: #4c4c4c;
+  margin: 8px 0;
+}
+
+.dark .clear-all {
+  color: #ababab;
+}

@@ -1,7 +1,23 @@
 //app.js
+const style = require("./unit/setStyle.js")
+
 App({
-  onLaunch: function () {
-    
+  onLaunch: function() {
+    //获取缓存
+    var theme, autoLogined
+    try {
+      theme = wx.getStorageSync('theme')
+      autoLogined = wx.getStorageSync('autoLogined')
+      if (theme && theme == 'dark') {
+        style.changeStyle(theme, true)
+      } else {
+        theme = 'light'
+      }
+    } catch (e) {
+      console.log(e)
+      theme = 'light'
+    }
+
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
@@ -15,6 +31,10 @@ App({
       })
     }
 
-    this.globalData = {}
+    this.globalData = {
+      logged: false,
+      theme: theme,
+      autoLogined: autoLogined
+    }
   }
 })

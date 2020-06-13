@@ -2,8 +2,10 @@
 var db = require("../../unit/db.js");
 var time = require("../../unit/date.js");
 import * as echarts from '../../ec-canvas/echarts';
-import '../../ec-canvas/darkin';
+import '../../ec-canvas/dark';
+import '../../ec-canvas/light';
 const app = getApp();
+const style = require("../../unit/setStyle.js")
 
 let chart = null;
 
@@ -37,7 +39,7 @@ function setOption(chart, data, name) {
       left: '2%',
       style: {
         text: '成交量',
-        fill: '#fff',
+        fill: '#ababab',
         shadowColor: '#e1e1e1'
       }
     }],
@@ -154,9 +156,9 @@ function setOption(chart, data, name) {
     ],
     yAxis: [{
         scale: true,
-        splitArea: {
-          show: true
-        },
+        // splitArea: {
+        //   show: true
+        // },
         axisLabel: {
           inside: true,
           formatter: '{value}\n'
@@ -318,7 +320,7 @@ function setOption(chart, data, name) {
 
 function initChart(canvas, width, height, dpr) {
   var that = this;
-  chart = echarts.init(canvas, 'darkin', {
+  chart = echarts.init(canvas, app.globalData.theme, {
     width: width,
     height: height,
     devicePixelRatio: dpr // new
@@ -352,6 +354,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    theme: app.globalData.theme,
     ec: {
       onInit: initChart
     },
@@ -363,12 +366,12 @@ Page({
       text: '确定'
     }],
     date: {
-      start: '2020-01-02',
-      end: '2020-03-01',
-      min: '2016-01-01',
-      max: '2020-04-02'
+      start: time.getMonths(1),
+      end: time.getMonths(0),
+      min: time.getYears(3),
+      max: time.getYears(0)
     },
-    is_hide: 'none',
+    is_hide: false,
     select_id: 'dk',
     more_data: false,
     /**
@@ -400,6 +403,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+    style.changeStyle(app.globalData.theme, true)
     var type = 'other';
     if (options.type == 'hushen')
       type = 'gupiao_data';
@@ -410,24 +414,18 @@ Page({
     else
       type = options.type;
 
+
+    this.setData({
+      theme: app.globalData.theme,
+      code: options.code,
+      type
+    });
+
     this.dataLoad(type, options.code, 'day', 1, 100);
 
     if (app.globalData.openid) {
       this.onQuery(options.code, type);
     }
-
-    var date = {
-      start: time.getMonths(1),
-      end: time.getMonths(0),
-      min: time.getYears(3),
-      max: time.getYears(0)
-    }
-
-    this.setData({
-      code: options.code,
-      type,
-      date
-    });
   },
 
   //显示更多数据
@@ -604,25 +602,8 @@ Page({
 
   // 显示搜索框
   seachIs: function() {
-    var is_hide = 'none';
-    if (this.data.is_hide == 'none') {
-      is_hide = 'flex';
-    }
     this.setData({
-      is_hide: is_hide,
-    })
-  },
-
-  seach: function(e) {
-    this.seachIs();
-    var seach_value = "";
-    if (typeof(e.detail.value) == 'string') {
-      seach_value = e.detail.value;
-    } else {
-      seach_value = e.detail.value.seach_value;
-    }
-    wx.navigateTo({
-      url: '/pages/seach/seach?seach_value=' + seach_value,
+      is_hide: true,
     })
   },
 
@@ -774,92 +755,67 @@ Page({
       title: '玩命加载中',
     })
     db.getData.selectByCode(type, code, date_unit, page, num).then(res => {
-        //请求成功
-        if (res.data[0] == undefined) {
-          wx.showToast({
-            title: '没有数据',
-            icon: 'none',
-            duration: 2000 //持续的时间
-          });
-          return;
-        }
-        var changeUnit = this.changeUnit;
-        var size = 75;
-        var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
-        if (len > 16) {
-          size = 55;
-        } else if (len > 10) {
-          size = 75 - (len - 10) * 4;
-        }
-        var value = {
-          code: res.data[0].code,
-          name: res.data[0].name,
-          size: size,
-          date: res.data[0].date,
-          current: res.data[0].closingPrice,
-          previousClose: res.data[0].previousClose,
-          quoteChange: res.data[0].quoteChange,
-          change: res.data[0].change,
-          openingPrice: res.data[0].openingPrice,
-          volume: changeUnit(res.data[0].volume),
-          turnoverRate: res.data[0].turnoverRate,
-          maxPrice: res.data[0].maxPrice,
-          minPrice: res.data[0].minPrice,
-          turnover: changeUnit(res.data[0].turnover),
-          totalMarketCapitaliza: changeUnit(res.data[0].totalMarketCapitalization),
-          pe: res.data[0].per,
-          qrr: res.data[0].qrr,
-          pbr: res.data[0].pbr,
-          ttm: res.data[0].ttm > 0 ? res.data[0].ttm.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3') : null,
-          eps: res.data[0].eps ? res.data[0].eps.toFixed(3) : '',
-          navps: res.data[0].navps ? res.data[0].navps.toFixed(3) : '',
-          amplitude: res.data[0].amplitude || ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
-          marketCapitalization: changeUnit(res.data[0].marketCapitalization)
-        };
-        var all_value = this.getTypeData(res.data.reverse(), date_unit);
-        console.log(all_value);
-        this.setData({
-          value,
-          all_value
-        });
-        // 隐藏加载框
-        wx.hideLoading();
-      })
-      .catch(err => {
-        //请求失败
+      //请求成功
+      if (res.data[0] == undefined) {
         wx.showToast({
-          title: '网络错误',
+          title: '没有数据',
           icon: 'none',
           duration: 2000 //持续的时间
-        })
+        });
+        return;
+      }
+      var changeUnit = this.changeUnit;
+      var size = 75;
+      var len = (res.data[0].name || res.data[0].fundName).replace(/[\u0391-\uFFE5]/g, "aa").length;
+      if (len > 16) {
+        size = 55;
+      } else if (len > 10) {
+        size = 75 - (len - 10) * 4;
+      }
+      var value = {
+        code: res.data[0].code,
+        name: res.data[0].name,
+        size: size,
+        date: res.data[0].date,
+        current: res.data[0].closingPrice,
+        previousClose: res.data[0].previousClose,
+        quoteChange: res.data[0].quoteChange,
+        change: res.data[0].change,
+        openingPrice: res.data[0].openingPrice,
+        volume: changeUnit(res.data[0].volume),
+        turnoverRate: res.data[0].turnoverRate,
+        maxPrice: res.data[0].maxPrice,
+        minPrice: res.data[0].minPrice,
+        turnover: changeUnit(res.data[0].turnover),
+        totalMarketCapitaliza: changeUnit(res.data[0].totalMarketCapitalization),
+        pe: res.data[0].per,
+        qrr: res.data[0].qrr,
+        pbr: res.data[0].pbr,
+        ttm: res.data[0].ttm > 0 ? res.data[0].ttm.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3') : null,
+        eps: res.data[0].eps ? res.data[0].eps.toFixed(3) : '',
+        navps: res.data[0].navps ? res.data[0].navps.toFixed(3) : '',
+        amplitude: res.data[0].amplitude || ((res.data[0].maxPrice - res.data[0].minPrice) / res.data[0].previousClose).toFixed(2),
+        marketCapitalization: changeUnit(res.data[0].marketCapitalization)
+      };
+      var all_value = this.getTypeData(res.data.reverse(), date_unit);
+      // console.log(all_value);
+      this.setData({
+        value,
+        all_value
       });
+      // 隐藏加载框
+      wx.hideLoading();
+    }).catch(err => {
+      //请求失败
+      wx.showToast({
+        title: '网络错误',
+        icon: 'none',
+        duration: 2000 //持续的时间
+      })
+    });
     setTimeout(function() {
       wx.hideLoading()
     }, 10000)
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {},
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function() {},
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function() {
-
   },
 
   /**
@@ -879,18 +835,4 @@ Page({
       wx.stopPullDownRefresh();
     }, 500)
   },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function() {
-
-  }
 })

@@ -1,0 +1,29 @@
+<!--miniprogram/pages/menu/menu.wxml-->
+<view class="{{theme}}">
+  <view class="container">
+    <view class="space"></view>
+    <view class="subtitle">主题</view>
+    <radio-group class="theme" bindchange="themeChange">
+      <label class="theme-item">
+        <image src="../../icon/light_theme.png" mode="aspectFit"></image>
+        <view class="theme-label">
+          <radio value="light" checked="{{theme == 'light'}}" />默认主题</view>
+      </label>
+      <label class="theme-item">      
+        <image src="../../icon/dark_theme.png" mode="aspectFit"></image>
+        <view class="theme-label">
+          <radio value="dark" checked="{{theme == 'dark'}}" />暗黑主题</view>
+      </label>
+    </radio-group>
+
+    <view class="space"></view>
+    <view class="subtitle">其他选项</view>
+    <view class="switch-item">
+      <text>自动登录</text>
+      <switch checked="{{autoLogined}}" bindchange="autoLogin" />
+    </view>
+  </view>
+
+  <!-- 侧边框 -->
+  <sidebar show="{{is_sidebar}}" item-name="setting"></sidebar>
+</view>

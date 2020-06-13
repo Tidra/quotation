@@ -1,8 +1,10 @@
 // miniprogram/pages/fund/fund.js
 var db = require("../../unit/db.js");
 import * as echarts from '../../ec-canvas/echarts';
-import '../../ec-canvas/darkin';
+import '../../ec-canvas/dark';
+import '../../ec-canvas/light';
 const app = getApp();
+const style = require("../../unit/setStyle.js")
 
 let chart = null;
 var globalData = {
@@ -70,7 +72,7 @@ function setOption(chart, data, name) {
 
 function initChart(canvas, width, height, dpr) {
   var that = this;
-  chart = echarts.init(canvas, 'darkin', {
+  chart = echarts.init(canvas, app.globalData.theme, {
     width: width,
     height: height,
     devicePixelRatio: dpr // new
@@ -88,11 +90,12 @@ Page({
    * 页面的初始数据
    */
   data: {
+    theme: app.globalData.theme,
     ec: {
       onInit: initChart
     },
     addOrDelete: true,
-    is_hide: 'none',
+    is_hide: false,
     select_id: 'first',
     value: '',
   },
@@ -101,18 +104,19 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    var type = 'jijin_data';
-    if (options.type == "国外")
-      type = 'USA_fund_data'
+    style.changeStyle(app.globalData.theme, true)
+    var type = options.type
+
+    this.setData({
+      theme: app.globalData.theme,
+      code: options.code,
+      type
+    });
+    
     this.dataLoad(type, options.code, 'day', 100);
     if (app.globalData.openid) {
       this.onQuery(options.code, type);
     }
-
-    this.setData({
-      code: options.code,
-      type
-    });
   },
 
   // 查询是否存在
@@ -229,7 +233,7 @@ Page({
 
   // 选择显示图表
   select: function(e) {
-    console.log(e)
+    // console.log(e)
     if (this.data.select_id == e.currentTarget.id) {
       return;
     }
@@ -242,25 +246,8 @@ Page({
 
   // 显示搜索框
   seachIs: function() {
-    var is_hide = 'none';
-    if (this.data.is_hide == 'none') {
-      is_hide = 'flex';
-    }
     this.setData({
-      is_hide: is_hide,
-    })
-  },
-
-  seach: function(e) {
-    this.seachIs();
-    var seach_value = "";
-    if (typeof(e.detail.value) == 'string') {
-      seach_value = e.detail.value;
-    } else {
-      seach_value = e.detail.value.seach_value;
-    }
-    wx.navigateTo({
-      url: '/pages/seach/seach?seach_value=' + seach_value,
+      is_hide: true,
     })
   },
 
@@ -340,14 +327,14 @@ Page({
             all_value.third.push(res.data[len - i - 1].change);
           }
         }
-        console.log(all_value);
+        // console.log(all_value);
         globalData = {
           "categoryData": all_value.date,
           "values": all_value.first
         }
 
         setOption(chart, globalData, '增长率');
-        console.log(globalData)
+        // console.log(globalData)
         this.setData({
           value,
           all_value
@@ -366,13 +353,6 @@ Page({
     setTimeout(function() {
       wx.hideLoading()
     }, 10000)
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {
-
   },
 
   /**

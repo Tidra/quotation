@@ -1,14 +1,19 @@
 /* miniprogram/pages/seach/seach.wxss */
+@import '../../style/itheme.wxss';
 
 /* 标题栏 */
 
 .head {
-  background-color: #0c090a;
+  background-color: #2990dc;
   width: 100%;
   padding: 10px 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+}
+
+.dark .head {
+  background-color: #1e1e1e;
 }
 
 .head .more {
@@ -27,29 +32,4 @@
   width: 25px;
   height: 25px;
   margin-right: 5%;
-}
-
-/* 选项 */
-.pic-opt {
-  width: 90%;
-  display: flex;
-  margin: 8px auto;
-  border: 1px solid grey;
-  border-radius: 5px;
-}
-
-.pic-opt text:not(:first-child) {
-  border-left: 1px solid grey;
-}
-
-.pic-opt .pic-sel {
-  width: 25%;
-  text-align: center;
-  color: #fff;
-  background: rgba(165, 165, 165, 0.863);
-}
-
-.pic-opt .pic-nosel {
-  width: 25%;
-  text-align: center;
 }

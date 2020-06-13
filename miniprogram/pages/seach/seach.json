@@ -1,4 +1,7 @@
 {
+  "navigationBarTitleText": "搜索结果",
   "disableScroll": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "seach": "../../unit/seach/seach"
+  }
 }

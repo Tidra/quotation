@@ -1,0 +1,38 @@
+<template name="item">
+  <view class="inf-opt">
+    <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">{{type==1?'股票名称':'基金名称'}}</view>
+    <view id="{{type==2?'unitNetWorth':'closingPrice'}}" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">
+      {{type==1?'最新':type==2?'净值':'收盘价'}}
+      <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
+    </view>
+    <view id="{{type==1?'quoteChange':type==2?'cumulativeNetWorth':'change'}}" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">
+      {{type==1?'涨幅':type==2?'累净值':'涨跌'}}
+      <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
+    </view>
+    <view id="{{type==1?'change':'growthRate'}}" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">
+      {{type==1?'涨跌':'增长率'}}
+      <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
+    </view>
+  </view>
+  <scroll-view style="height: {{winHeight}}px;" scroll-y scroll-top="{{reset_scroll}}" enable-back-to-top="true" bindscrolltolower="bottomReLoad" refresher-enabled="{{ref}}" refresher-triggered="{{refTri}}" bindrefresherrefresh="onRefresh">
+    <view id="{{item.code}}" wx:for="{{value}}" wx:key="index" bindlongtap="showAddOption" bindtap="toDetail">
+      <view class="inf-item {{(item.growthRate>=0||item.change>=0)?'col-red':'col-green'}}">
+        <view class="item width-40">
+          <text class="name">{{item.name}}</text>
+          <text class="code">{{item.code}}</text>
+        </view>
+        <text class="width-20">{{type==2?item.unitNetWorth:item.closingPrice}}</text>
+        <text class="width-20">{{type==1?item.quoteChange:type==2?item.cumulativeNetWorth:item.change}}</text>
+        <text class="width-20">{{type==1?item.change:item.growthRate}}%</text>
+      </view>
+    </view>
+
+    <view class='loading' bindtap="bottomReLoad" wx:if="{{showLoade}}">
+      <view class='ui-loading' wx:if="{{showLoading&&page!='max'}}"></view>
+      <view class='Data' wx:if="{{page=='max'}}">没有更多数据了</view>
+      <view class='Data' wx:elif="{{showLoading}}">加载中...</view>
+      <view class='Data' wx:else>加载更多数据</view>
+    </view>
+  </scroll-view>
+
+</template>

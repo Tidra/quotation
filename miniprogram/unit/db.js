@@ -21,8 +21,11 @@ function request(method, url, data) {
       header: header,
       success(res) {
         //请求成功
-        // return res.data;
+        if (data && data.type) {
+          res.data[0].type = data.type
+        }
         resolve(res);
+
         //判断状态码---errCode状态根据后端定义来判断
         // if (res.data.errCode == 0) {
         //   resolve(res);
@@ -33,7 +36,8 @@ function request(method, url, data) {
       },
       fail(err) {
         //请求失败
-        reject(err)
+        console.log(data)
+        reject([err, data])
         // console.log(err)
       }
     });
@@ -42,13 +46,13 @@ function request(method, url, data) {
 
 const getData = {
   // 单支股票全部数据
-  selectByCode: function(type, code, date_unit, page, num) {
+  selectByCode: function(type, code, date_unit, page, num, sec_data) {
     var url_data = type + '/findDataByCodeOrName/';
     url_data += code + '/';
     url_data += page + '/';
     url_data += num;
-    console.log(url_data)
-    return request(GET, url_data)
+    // console.log(url_data)
+    return request(GET, url_data, sec_data)
   },
   // 单类型全部数据
   selectAll: function(type, order, start, other) {
@@ -59,8 +63,7 @@ const getData = {
     if (order == undefined) {
       order = 'comprehensive';
     }
-    url_data += order + '/' + start.toString() + '/11';
-    console.log(url_data)
+    url_data += order + '/' + start.toString() + '/15';
     return request(GET, url_data)
   },
   // 模糊查询
@@ -71,7 +74,11 @@ const getData = {
       order = 'comprehensive';
     }
     url_data += order + '/' + start.toString() + '/12';
-    console.log(url_data)
+    return request(GET, url_data);
+  },
+  // 职业信息
+  selectWork: function(item) {
+    var url_data = 'jobs/' + item
     return request(GET, url_data);
   }
 };

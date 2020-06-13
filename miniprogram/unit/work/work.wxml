@@ -1,0 +1,8 @@
+<!--unit/work/work.wxml-->
+<scroll-view style="height: {{winHeight}}px;" scroll-y>
+  <view class="chart">
+    <ec-canvas id="mychart-dom-muti-type" canvas-id="mychart-muti-type" ec="{{ type }}"></ec-canvas>
+    <ec-canvas id="mychart-dom-muti-city" canvas-id="mychart-muti-city" ec="{{ city }}"></ec-canvas>
+    <ec-canvas id="mychart-dom-muti-education" canvas-id="mychart-muti-education" ec="{{ education }}"></ec-canvas>
+  </view>
+</scroll-view>

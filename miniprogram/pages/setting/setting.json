@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "设置",
+  "usingComponents": {
+    "sidebar": "../../unit/sidebar/sidebar"
+  }
+}

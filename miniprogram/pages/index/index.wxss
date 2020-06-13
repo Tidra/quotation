@@ -1,14 +1,21 @@
 /* miniprogram/pages/index/index.wxss */
+@import '../../style/itheme.wxss';
 
 /* 标题栏 */
 
 .head {
-  background-color: #0c090a;
   width: 100%;
   padding: 10px 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  background-color: #2990dc;
+  color: #fff;
+}
+
+.dark .head {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
 }
 
 .head .more {
@@ -36,9 +43,13 @@
 }
 
 .pre-opt {
-  background: #0c090a;
+  background-color: #fff;
   padding: 7px 0;
   /*border: 1px solid grey;*/
+}
+
+.dark .pre-opt {
+  background-color: #121212;
 }
 
 .pre-items {
@@ -59,7 +70,7 @@
 
 .pre-opt .opt-yes {
   width: 20%;
-  color: #04f;
+  color: #2990dc;
   text-align: center;
   position: relative;
 }
@@ -70,7 +81,7 @@
   display: block;
   bottom: -6px;
   height: 4.5px;
-  background: #04f;
+  background: #2990dc;
   right: 35%;
   left: 35%;
   border-radius: 10px;
@@ -88,7 +99,11 @@
 
 .pre-item .pre-name {
   font-size: 14px;
-  color: white;
+  color: #363636;
+}
+
+.dark .pre-item .pre-name {
+  color: #f0f0f0;
 }
 
 .pre-item .pre-sum {
@@ -104,102 +119,11 @@
 }
 
 /* 指数选项 */
+
 .pic-opt {
   width: 40%;
-  display: flex;
-  margin: 8px auto;
-  border: 1px solid grey;
-  border-radius: 5px;
 }
 
-.pic-opt text:not(:first-child) {
-  border-left: 1px solid grey;
-}
-
-.pic-opt .pic-sel {
+.pic-opt .pic-sel, .pic-opt .pic-nosel {
   width: 50%;
-  text-align: center;
-  color: #fff;
-  background: rgba(165, 165, 165, 0.863);
-}
-
-.pic-opt .pic-nosel {
-  width: 50%;
-  text-align: center;
-}
-
-/* .add_myself {
-  height: 100%;
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: #fff;
-  background: #f00;
-  box-shadow: -70px 0 80px 20px #888888;
-  padding:  0 10px;
-} */
-
-/* 侧边框 */
-
-.sidebar {
-  position: absolute;
-  height: 100%;
-  width: 200px;
-  top: 0;
-  left: 0;
-  background: #0e0e0e;
-  /* border-right: 1px solid #3a3a3a; */
-  z-index: 300;
-  white-space: normal;
-  color: #fff;
-  font-size: 18px;
-  transition: all 320ms ease;
-}
-
-.user {
-  margin: 30px;
-  padding: 0;
-  text-align: center;
-  line-height: 1;
-  color: #fff;
-}
-
-.user-img {
-  height: 80px;
-  width: 80px;
-  border-radius: 100%;
-}
-
-.user-inf {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.sidebar .item {
-  padding: 15px 0;
-  padding-left: 24px;
-  margin-left: 10px;
-  border-bottom: 1px solid #1b1b1b;
-}
-
-.sidebar .item-is {
-  background: #1b1b1b;
-  color: #04f;
-  padding: 15px 0;
-  padding-left: 20px;
-  margin-left: 10px;
-  border-bottom: 1px solid #1b1b1b;
-  border-left: 4px solid #04f;
-}
-
-.sidebar .about {
-  position: absolute;
-  bottom: 0;
-  padding: 30px 15px;
-  font-size: 12px;
-  color: #aaa;
-}
-
-.sidebar .about view {
-  padding-bottom: 5px;
 }

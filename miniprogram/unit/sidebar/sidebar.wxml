@@ -1,0 +1,20 @@
+<!--unit/sidebar/sidebar.wxml-->
+<!-- 遮罩 -->
+<view class="shade" style="display:{{show?'block':'none'}};" bindtap="closeAll"></view>
+<!-- 侧边框 -->
+<view class="sidebar {{theme}}" style="left: {{show?'0':'-200px'}}">
+  <button class="user" open-type="getUserInfo" bindgetuserinfo="onGetUserInfo" size="default">
+    <image class="user-img" src="{{avatarUrl}}"></image>
+    <view class="user-inf">
+      <view>{{nickName}}</view>
+    </view>
+  </button>
+  <view class="{{itemName=='hq'?'item-is':'item'}}" bindtap="{{itemName=='hq'?'closeAll':'showHq'}}">行情数据</view>
+  <view class="{{itemName=='more'?'item-is':'item'}}" bindtap="{{itemName=='more'?'closeAll':'showMore'}}">自选内容</view>
+  <view class="{{itemName=='setting'?'item-is':'item'}}" bindtap="{{itemName=='setting'?'closeAll':'showSet'}}">设置</view>
+  <view class="about">
+    <view>关于：</view>
+    <view>本小程序主要用于学习所用，未经授权不得用于任何商业用途。</view>
+    <view>Design by 车松轩</view>
+  </view>
+</view>

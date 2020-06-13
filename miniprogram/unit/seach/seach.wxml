@@ -1,0 +1,60 @@
+<!--unit/seach/seach.wxml-->
+<view class="shade" style="display:{{show&&!inshow?'block':'none'}};" bindtap="closeAll"></view>
+
+<view class="{{theme}}" style="display:{{show?'flex':'none'}};position:{{inshow?'static':'absolute'}};">
+  <view class="seach">
+    <view class="in-seach {{(focus||isFocus||inshow)?'width-85':''}}" bindtap="onFocus">
+      <image class="seach-img" src='/icon/seach.png' mode="aspectFit"></image>
+      <input id="{{type?type:'gupiao_data'}}" focus='{{!inshow&&(focus||isFocus)}}' confirm-type="search" value="{{seach_value}}" placeholder="股票名称/代码" bindconfirm="seach" bindinput="onInput" bindfocus="onFocus"></input>
+      <icon style="display:{{seach_value?'block':'none'}};" type="cancel" size="20" bindtap="clear"></icon>
+    </view>
+    <view style="display:{{(focus||isFocus)&&!inshow?'block':'none'}};" bindtap="closeAll">取消</view>
+    <view id="{{type}}" style="display:{{inshow?'block':'none'}};" bindtap="seach">搜索</view>
+  </view>
+
+  <view class="subtitle" wx:if="{{!inshow}}">搜索指定内容</view>
+  <view class="item" wx:if="{{!inshow}}">
+    <text id="gupiao_data" bindtap="seach">沪深</text>
+    <span class="split" />
+    <text id="USA_stock_data" bindtap="seach">美股</text>
+    <span class="split" />
+    <text id="shangzheng_shenzheng_data" bindtap="seach">指数</text>
+  </view>
+  <view class="item" wx:if="{{!inshow}}">
+    <text id="jijin_data" bindtap="seach">国内基金</text>
+    <span class="split" />
+    <text id="USA_fund_data" bindtap="seach">国外基金</text>
+  </view>
+
+  <view class="inshow-item" wx:else>
+    <view id="gupiao_data" bindtap="seach">
+      <view class="{{type=='gupiao_data'?'opt-yes':''}}">沪深</view>
+    </view>
+    <view id="USA_stock_data" bindtap="seach">
+      <view class="{{type=='USA_stock_data'?'opt-yes':''}}">美股</view>
+    </view>
+    <view id="shangzheng_shenzheng_data" bindtap="seach">
+      <view class="{{type=='shangzheng_shenzheng_data'?'opt-yes':''}}">指数</view>
+    </view>
+    <view id="jijin_data" bindtap="seach">
+      <view class="{{type=='jijin_data'?'opt-yes':''}}">国内基金</view>
+    </view>
+    <view id="USA_fund_data" bindtap="seach">
+      <view class="{{type=='USA_fund_data'?'opt-yes':''}}">国外基金</view>
+    </view>
+  </view>
+
+  <view class="subtitle" wx:if="{{seachList.length>0&&!inshow}}">搜索历史</view>
+  <view id="{{index}}" class="seach-list" wx:for="{{seachList}}" wx:key="index" bindtap="seach" wx:if="{{!inshow}}">
+    <view class="li">
+      <view class="ic" wx:if="{{item.type=='gupiao_data'}}">沪深</view>
+      <view class="ic" wx:if="{{item.type=='USA_stock_data'}}">美股</view>
+      <view class="ic" wx:if="{{item.type=='shangzheng_shenzheng_data'}}">指数</view>
+      <view class="ic" wx:if="{{item.type=='jijin_data'}}">国内基金</view>
+      <view class="ic" wx:if="{{item.type=='USA_fund_data'}}">国外基金</view>
+      <view>{{item.value}}</view>
+    </view>
+    <view id="{{index}}" class="delete" catchtap="clearList">×</view>
+  </view>
+  <view class="clear-all" bindtap="clearAll" wx:if="{{seachList.length>0&&!inshow}}">清空历史记录</view>
+</view>

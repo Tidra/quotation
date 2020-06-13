@@ -1,0 +1,13 @@
+/* unit/work/work.wxss */
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+ec-canvas {
+  width: 100%;
+  height: 650rpx;
+}

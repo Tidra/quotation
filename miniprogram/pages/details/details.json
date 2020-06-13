@@ -3,6 +3,7 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "ec-canvas": "../../ec-canvas/ec-canvas",
-    "mp-dialog": "../../dialog/dialog"
+    "mp-dialog": "../../dialog/dialog",
+    "seach": "../../unit/seach/seach"
   }
 }

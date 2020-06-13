@@ -1,84 +1,50 @@
 <!--miniprogram/pages/user/user.wxml-->
-<view class="container">
+<import src="../../unit/item.wxml" />
+<view class="container {{theme}}">
 
   <!--头部-->
   <view class="head">
-    <image class="more" src='/icon/home.png' mode="aspectFit" bindtap="toHome"></image>
+    <image class="more" src='/icon/{{theme}}-more.png' mode="aspectFit" bindtap="toSide"></image>
     <label class="title">自选</label>
     <image class="seach" src='/icon/seach.png' mode="aspectFit" bindtap="seachIs"></image>
   </view>
 
-  <view class="pic-opt">
-    <text id="gupiao_data" class="{{select_id=='gupiao_data'?'pic-sel':'pic-nosel'}}" bindtap="select">沪深</text>
-    <text id="USA_stock_data" class="{{select_id=='USA_stock_data'?'pic-sel':'pic-nosel'}}" bindtap="select">美股</text>
-    <text id="shangzheng_shenzheng_data" class="{{select_id=='shangzheng_shenzheng_data'?'pic-sel':'pic-nosel'}}" bindtap="select">指数</text>
-    <text id="jijin_data" class="{{select_id=='jijin_data'?'pic-sel':'pic-nosel'}}" bindtap="select">基金</text>
+  <view class="space"></view>
+  <view class="inshow-item">
+    <view id="gupiao_data" bindtap="select">
+      <view class="{{select_id=='gupiao_data'?'opt-yes':''}}">沪深</view>
+    </view>
+    <view id="USA_stock_data" bindtap="select">
+      <view class="{{select_id=='USA_stock_data'?'opt-yes':''}}">美股</view>
+    </view>
+    <view id="shangzheng_shenzheng_data" bindtap="select">
+      <view class="{{select_id=='shangzheng_shenzheng_data'?'opt-yes':''}}">指数</view>
+    </view>
+    <view id="jijin_data" bindtap="select">
+      <view class="{{select_id=='jijin_data'?'opt-yes':''}}">国内基金</view>
+    </view>
+    <view id="USA_fund_data" bindtap="select">
+      <view class="{{select_id=='USA_fund_data'?'opt-yes':''}}">国外基金</view>
+    </view>
   </view>
 
   <!--板块信息-->
-  <view class="inf" wx:if="{{select_id != 'jijin_data'}}">
-    <view class="inf-opt">
-      <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">股票名称</view>
-      <view id="closingPrice" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">最新
-        <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
-      </view>
-      <view id="quoteChange" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">涨幅
-        <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
-      </view>
-      <view id="change" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">涨跌
-        <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
-      </view>
-    </view>
-    <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
-      <view class="inf-item {{item.change>0?'col-red':'col-green'}}">
-        <view class="item width-40">
-          <text class="name">{{item.name}}</text>
-          <text class="code">{{item.code}}</text>
-        </view>
-        <text class="width-20">{{item.closingPrice}}</text>
-        <text class="width-20">{{item.quoteChange}}%</text>
-        <text class="width-20">{{item.change}}</text>
-      </view>
-    </view>
+  <!-- 国内基金 -->
+  <view class="inf" wx:if="{{select_id == 'jijin_data'}}">
+    <template is="item" data="{{sort_by,sort_icon,winHeight:winHeight,reset_scroll,value:value[select_id],type:2,showLoade:false}}"></template>
   </view>
-  <!-- 基金 -->
+  <!-- 国外基金 -->
+  <view class="inf" wx:elif="{{select_id == 'USA_fund_data'}}">
+    <template is="item" data="{{sort_by,sort_icon,winHeight:winHeight,reset_scroll,value:value[select_id],type:3,showLoade:false}}"></template>
+  </view>
+  <!-- 其他 -->
   <view class="inf" wx:else>
-    <view class="inf-opt">
-      <view id="comprehensive" class="width-40 {{sort_by=='comprehensive'? 'col-blue':''}}" bindtap="sort">基金名称</view>
-      <view id="unitNetWorth" class="width-20 {{sort_icon[0]!='up-down'? 'col-blue':''}}" bindtap="sort">净值
-        <image class="opt-icon" src="../../icon/{{sort_icon[0]}}.png"></image>
-      </view>
-      <view id="cumulativeNetWorth" class="width-20 {{sort_icon[1]!='up-down'? 'col-blue':''}}" bindtap="sort">累净值
-        <image class="opt-icon" src="../../icon/{{sort_icon[1]}}.png"></image>
-      </view>
-      <view id="growthRate" class="width-20 {{sort_icon[2]!='up-down'? 'col-blue':''}}" bindtap="sort">增长率
-        <image class="opt-icon" src="../../icon/{{sort_icon[2]}}.png"></image>
-      </view>
-    </view>
-    <scroll-view style="height: {{winHeight+62}}px;" scroll-y="true" enable-back-to-top="true" bindscrolltolower="bottomReLoad">
-      <view id="{{item.code}}" wx:for="{{value[select_id]}}" data-item="item" bindlongtap="showAddOption" bindtap="toDetail">
-        <view class="inf-item {{item.growthRate>=0?'col-red':'col-green'}}">
-          <view class="item width-40">
-            <text class="name">{{item.name}}</text>
-            <text class="code">{{item.code}}</text>
-          </view>
-          <text class="width-20">{{item.unitNetWorth}}</text>
-          <text class="width-20">{{item.cumulativeNetWorth}}</text>
-          <text class="width-20">{{item.growthRate}}%</text>
-        </view>
-        <!-- <view class="add_myself">加入自选</view> -->
-      </view>
-    </scroll-view>
+    <template is="item" data="{{sort_by,sort_icon,winHeight:winHeight,reset_scroll,value:value[select_id],type:1,showLoade:false}}"></template>
   </view>
 
-  <!-- 搜索遮罩 -->
-  <view class="shade" style="display:{{is_hide}};" bindtap="seachIs"></view>
-  <form bindsubmit="seach" style="display:{{is_hide}}; width:90%;">
-    <view class="in-seach">
-      <image class="seach" src='/icon/seach.png' mode="aspectFit"></image>
-      <input name="seach_value" focus="true" confirm-type="search" placeholder="股票名称/代码" bindconfirm="seach"></input>
-      <button form-type="submit">搜索</button>
-    </view>
-  </form>
+  <!-- 侧边框 -->
+  <sidebar show="{{is_sidebar}}" item-name="more"></sidebar>
+  <!-- 搜索框 -->
+  <seach show="{{is_hide}}"></seach>
 
 </view>

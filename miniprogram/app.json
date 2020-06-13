@@ -4,12 +4,13 @@
     "pages/details/details",
     "pages/seach/seach",
     "pages/user/user",
-    "pages/fund/fund"
+    "pages/fund/fund",
+    "pages/setting/setting"
   ],
   "window": {
-    "backgroundColor": "#0e0e0e",
+    "backgroundColor": "#ffffff",
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#0e0e0e",
+    "navigationBarBackgroundColor": "#2990DC",
     "navigationBarTitleText": "市场行情分析小程序",
     "navigationBarTextStyle": "white"
   },

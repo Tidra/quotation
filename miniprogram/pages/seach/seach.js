@@ -1,12 +1,14 @@
 // miniprogram/pages/seach/seach.js
 var db = require("../../unit/db.js")
-Page({
+const style = require("../../unit/setStyle.js")
+const app = getApp()
 
+Page({
   /**
    * 页面的初始数据
    */
   data: {
-    is_hide: 'none',
+    theme: app.globalData.theme,
     select_id: 'gupiao_data',
     sort_by: 'comprehensive',
     sort_icon: ['up-down', 'up-down', 'up-down'],
@@ -67,7 +69,7 @@ Page({
         });
       }, 50);
     } else {
-      if (this.data.select_id == 'jijin_data') {
+      if (this.data.select_id == 'jijin_data' || this.data.select_id == 'USA_fund_data') {
         wx.navigateTo({
           url: '/pages/fund/fund?code=' + e.currentTarget.id + '&type=' + this.data.select_id,
         })
@@ -79,32 +81,18 @@ Page({
     }
   },
 
-  // 显示搜索框
-  seachIs: function() {
-    var is_hide = 'none';
-    if (this.data.is_hide == 'none') {
-      is_hide = 'flex';
-    }
-    this.setData({
-      is_hide: is_hide,
-    })
-  },
-
   seach: function(e) {
-    var seach_value = "";
-    if (typeof(e.detail.value) == 'string') {
-      seach_value = e.detail.value;
-    } else {
-      seach_value = e.detail.value.seach_value;
-    }
+    var seach_value = e.detail.seach_value
+    var select_id = e.detail.type
     this.setData({
       page: 1,
+      reset_scroll: 0,
       seach_value,
+      select_id,
       sort_by: 'comprehensive',
       sort_icon: ['up-down', 'up-down', 'up-down']
     });
-    this.seachIs();
-    this.dataLoad(this.data.select_id, seach_value, 'comprehensive', 1)
+    this.dataLoad(select_id, seach_value, 'comprehensive', 1)
   },
 
   //触底添加数据
@@ -113,12 +101,12 @@ Page({
   },
 
   //数据获取
-  dataLoad: function(type, data, order, start) {
+  dataLoad: function (type, data, order, start) {
     if (start == 'max1') {
       return;
     }
-    wx.showLoading({
-      title: '玩命加载中',
+    this.setData({
+      showLoading: true
     })
 
     var newData = data;
@@ -130,22 +118,30 @@ Page({
         console.log(res, typeof(res.data))
         var value = this.data.value;
         var newValue = res.data.map(function(e) {
-          if (type != 'jijin_data') {
-            return {
-              code: e.code,
-              name: e.name,
-              current: e.closingPrice,
-              previousClose: e.previousClose,
-              quoteChange: e.quoteChange,
-              change: e.change
-            }
-          } else {
+          if (type == 'jijin_data') {
             return {
               code: e.code,
               name: e.fundName,
               unitNetWorth: e.unitNetWorth.toFixed(3),
               cumulativeNetWorth: e.cumulativeNetWorth.toFixed(3),
               growthRate: e.growthRate.toFixed(2)
+            }
+          } else if (type == 'USA_fund_data') {
+            return {
+              code: e.code,
+              name: e.fundName,
+              closingPrice: e.closingPrice,
+              change: e.change,
+              growthRate: e.growthRate.toFixed(2)
+            }
+          } else {
+            return {
+              code: e.code,
+              name: e.name,
+              closingPrice: e.closingPrice,
+              previousClose: e.previousClose,
+              quoteChange: e.quoteChange,
+              change: e.change
             }
           }
         });
@@ -156,7 +152,7 @@ Page({
               return {
                 code: e.code,
                 name: e.name,
-                current: e.closingPrice,
+                closingPrice: e.closingPrice,
                 previousClose: e.previousClose,
                 quoteChange: e.quoteChange,
                 change: e.change
@@ -171,13 +167,12 @@ Page({
             if (newValue.length == 0) {
               start = 'max'
             }
-            // 隐藏加载框
-            wx.hideLoading();
 
             console.log(value);
             this.setData({
               page: start,
-              value
+              value,
+              showLoading: false
             });
           }).catch(err => {
             //请求失败
@@ -196,12 +191,12 @@ Page({
           if (newValue.length == 0) {
             start = 'max'
           }
-          // 隐藏加载框
-          wx.hideLoading();
+          
           console.log(value);
           this.setData({
             page: start,
-            value
+            value,
+            showLoading: false
           });
         }
       })
@@ -213,70 +208,20 @@ Page({
           duration: 2000 //持续的时间
         })
       });
-    setTimeout(function () {
-      wx.hideLoading()
-    }, 5000)
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    console.log(options);
+    style.changeStyle(app.globalData.theme, false)
     this.setData({
+      theme: app.globalData.theme,
       page: 1,
       seach_value: options.seach_value,
-      winHeight: wx.getSystemInfoSync().windowHeight - 115
+      select_id: options.type,
+      winHeight: wx.getSystemInfoSync().windowHeight - 122
     })
-    this.dataLoad('gupiao_data', options.seach_value, 'comprehensive', 1)
+    this.dataLoad(options.type, options.seach_value, 'comprehensive', 1)
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function() {
-
-  }
 })
