@@ -216,32 +216,32 @@
 
 #### 主页
 <div align="center">
-  <img src="imgs/index_2.0.0.jpg" height="330" alt="主页（index）" >
+  <img src="imgs/index_2.0.0.png" height="330" alt="主页（index）" >
 </div>
 
 #### 自选页以及侧边栏
 <div align="center">
-  <img src="imgs/user.jpg" height="330" alt="自选页（user）" >
+  <img src="imgs/user.png" height="330" alt="自选页（user）" >
 </div>
 
 #### 搜索页以及搜索接口
 <div align="center">
-  <img src="imgs/seach_2.0.0.jpg" height="330" alt="搜索页（seach）" >
+  <img src="imgs/seach_2.0.0.png" height="330" alt="搜索页（seach）" >
 </div>
 
 #### 基金类详情页
 <div align="center">
-  <img src="imgs/fund.jpg" height="330" alt="基金类详情页（fund）" >
+  <img src="imgs/fund.png" height="330" alt="基金类详情页（fund）" >
 </div>
 
 #### 非基金类详情页
 <div align="center">
-  <img src="imgs/details_2.0.0.jpg" height="330" alt="非基金类详情页（details）" >
+  <img src="imgs/details_2.0.0.png" height="330" alt="非基金类详情页（details）" >
 </div>
 
 #### 设置页
 <div align="center">
-  <img src="imgs/setting.jpg" height="330" alt="设置页（setting）" >
+  <img src="imgs/setting.png" height="330" alt="设置页（setting）" >
 </div>
 
 ## 静态页面编写
